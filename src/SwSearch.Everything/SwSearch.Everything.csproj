@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\SwSearch.Contracts\SwSearch.Contracts.csproj" />
+  </ItemGroup>
+</Project>
+

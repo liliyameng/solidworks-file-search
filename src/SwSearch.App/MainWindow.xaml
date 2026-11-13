@@ -1,0 +1,21 @@
+<Window x:Class="SwSearch.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:wfi="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"
+        Title="SOLIDWORKS 文件检索" Icon="Assets/Brand/SwSearch.ico"
+        Height="650" Width="1120" MinHeight="420" MinWidth="760"
+        WindowStartupLocation="CenterScreen" Background="#F5F5F5"
+        PreviewKeyDown="Window_OnPreviewKeyDown">
+    <Grid>
+        <Grid.RowDefinitions>
+            <!-- WebView is deliberately toolbar-only. The result surface below
+                 is a native Windows Shell ExplorerBrowser host. -->
+            <RowDefinition Height="48" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="28" />
+        </Grid.RowDefinitions>
+        <wfi:WindowsFormsHost x:Name="WebToolbarContainer" Grid.Row="0" />
+        <wfi:WindowsFormsHost x:Name="NativeResultsContainer" Grid.Row="1" />
+        <wfi:WindowsFormsHost x:Name="NativeStatusContainer" Grid.Row="2" />
+    </Grid>
+</Window>

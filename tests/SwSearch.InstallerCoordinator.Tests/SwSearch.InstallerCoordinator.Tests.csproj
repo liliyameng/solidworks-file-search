@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\SwSearch.InstallerCoordinator\SwSearch.InstallerCoordinator.csproj" />
+    <ProjectReference Include="..\SwSearch.InstallerCoordinator.NativeHelper\SwSearch.InstallerCoordinator.NativeHelper.csproj"
+                      ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\SwSearch.InstallerCoordinator.WatchdogHelper\SwSearch.InstallerCoordinator.WatchdogHelper.csproj"
+                      ReferenceOutputAssembly="false" />
+  </ItemGroup>
+  <Target Name="CopyNativeCoordinatorGateHelper" AfterTargets="Build">
+    <ItemGroup>
+      <NativeCoordinatorGateHelper Include="..\SwSearch.InstallerCoordinator.NativeHelper\bin\$(Configuration)\net8.0-windows\**\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(NativeCoordinatorGateHelper)"
+          DestinationFiles="@(NativeCoordinatorGateHelper->'$(OutDir)NativeCoordinatorGateHelper\%(RecursiveDir)%(Filename)%(Extension)')" />
+  </Target>
+  <Target Name="CopyInstallerCoordinatorWatchdogHelper" AfterTargets="Build">
+    <ItemGroup>
+      <InstallerCoordinatorWatchdogHelper Include="..\SwSearch.InstallerCoordinator.WatchdogHelper\bin\$(Configuration)\net8.0-windows\**\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(InstallerCoordinatorWatchdogHelper)"
+          DestinationFiles="@(InstallerCoordinatorWatchdogHelper->'$(OutDir)InstallerCoordinatorWatchdogHelper\%(RecursiveDir)%(Filename)%(Extension)')" />
+  </Target>
+</Project>

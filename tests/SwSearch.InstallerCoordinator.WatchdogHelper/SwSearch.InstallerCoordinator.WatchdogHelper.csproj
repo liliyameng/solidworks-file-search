@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>SwSearch.InstallerCoordinator.WatchdogHelper</AssemblyName>
+    <RootNamespace>SwSearch.InstallerCoordinator.WatchdogHelper</RootNamespace>
+    <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\SwSearch.InstallerCoordinator\SwSearch.InstallerCoordinator.csproj" />
+  </ItemGroup>
+</Project>

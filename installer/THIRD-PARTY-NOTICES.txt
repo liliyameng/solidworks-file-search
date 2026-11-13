@@ -1,0 +1,32 @@
+SwSearch third-party notices
+============================
+
+Runtime payload
+---------------
+The x64 MSI is framework-dependent and does not contain the Microsoft .NET 8
+runtime. It includes the Microsoft WebView2 SDK loader 1.0.4078.44
+(BSD-3-Clause), Microsoft.Data.Sqlite 8.0.28 (MIT License), SQLitePCLRaw 2.1.11
+(Apache License 2.0), and the e_sqlite3 native SQLite build. SQLite itself is
+dedicated to the public domain.
+
+No Everything binary, WebView2 Runtime, SOLIDWORKS component, eDrawings
+component, Windows Search component, external database service, Visual C++
+redistributable installer, or third-party executable installer is bundled.
+Microsoft .NET 8 Desktop Runtime and Microsoft Edge WebView2 Evergreen Runtime
+are system prerequisites; the installer does not download them.
+
+Build-only dependency
+---------------------
+WiX Toolset 5.0.2 is used from the existing workspace package cache and is
+licensed under the Microsoft Reciprocal License (MS-RL). WiX build tools are not
+installed machine-wide and are not included as runnable product tooling.
+
+Package: https://www.nuget.org/packages/wix/5.0.2
+License: https://github.com/wixtoolset/wix/blob/main/LICENSE.TXT
+
+Distribution format
+-------------------
+Version 1.3.12 RC87 is distributed only as a standard per-machine x64 MSI with
+an embedded cabinet. There is no Burn bootstrapper, Setup.exe, ZIP, 7z,
+self-extracting archive, or portable registration script in the delivered
+payload.

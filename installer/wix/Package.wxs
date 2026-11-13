@@ -1,0 +1,304 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui"
+     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+  <Package Name="SOLIDWORKS 文件检索"
+           Manufacturer="SwSearch"
+           Version="$(var.ProductVersion)"
+           ProductCode="$(var.ProductCode)"
+           UpgradeCode="D9158356-29B3-44D6-A15A-ACDCE8328703"
+           Language="2052"
+           Scope="perMachine"
+           InstallerVersion="500"
+           Compressed="yes">
+    <SummaryInformation Description="SOLIDWORKS 文件名与属性检索（含右侧任务窗格）" Manufacturer="SwSearch" />
+    <MajorUpgrade Schedule="afterInstallExecute"
+                  DowngradeErrorMessage="已安装更新版本的 SOLIDWORKS 文件检索。" />
+    <MediaTemplate EmbedCab="yes" CompressionLevel="medium" />
+
+    <Property Id="INSTALLLEVEL" Value="1" />
+    <Property Id="REBOOT" Value="ReallySuppress" Secure="yes" />
+    <Property Id="MsiLogging" Value="voicewarmupx!" />
+    <Property Id="SWSEARCHTRUSTEDSID" Hidden="yes" Secure="yes" />
+    <Property Id="SWSEARCHTRUSTEDSESSIONID" Hidden="yes" Secure="yes" />
+    <Property Id="SWSEARCHSESSIONNONCE" Hidden="yes" Secure="yes" />
+    <Property Id="SWSEARCHDEADLINETICK" Hidden="yes" Secure="yes" />
+    <Property Id="SWSEARCHINSTALLACTION" Hidden="yes" Secure="yes" />
+    <Property Id="SWSEARCHTRUSTEDROOTPOLICY" Hidden="yes" Secure="yes" />
+    <Property Id="SWSEARCHCONTEXTREADY" Hidden="yes" Secure="yes" />
+    <Property Id="SWSEARCHMACHINECONTEXTREADY" Hidden="yes" Secure="yes" />
+    <Property Id="SWSEARCHDOTNETCORE8" Value="0" Secure="yes" />
+    <Property Id="SWSEARCHWINDOWSDESKTOP8" Value="0" Secure="yes" />
+    <Property Id="SWSEARCHDOTNET8READY" Value="0" Secure="yes" />
+    <Property Id="SwSearchPrivilegedHandle" Hidden="yes" />
+    <Property Id="ARPCOMMENTS" Value="包含 SOLIDWORKS 2024 x64 Taskpane 基线组件；安装需要一次管理员权限。" />
+    <Property Id="LEGACY_PERUSER_INSTALL">
+      <RegistrySearch Id="FindLegacyPerUserInstall" Root="HKCU" Key="Software\SwSearch\Installer" Name="StartMenuShortcut" Type="raw" />
+    </Property>
+    <Launch Condition="Installed OR NOT LEGACY_PERUSER_INSTALL"
+            Message="检测到 v1.1.x 当前用户安装。由于 Windows Installer 不支持跨 per-user/per-machine 上下文原地升级，请先从“已安装的应用”卸载旧版，再运行 v1.2.0 安装包。用户索引和设置位于 LocalAppData，不会由旧版卸载删除。" />
+    <Launch Condition="SWSEARCHDOTNETCORE8 = &quot;1&quot;"
+            Message="未检测到 x64 Microsoft.NETCore.App 8。请先离线安装 x64 .NET 8 Desktop Runtime，然后重试。安装程序不会联网或自动安装运行时。" />
+    <Launch Condition="SWSEARCHWINDOWSDESKTOP8 = &quot;1&quot;"
+            Message="未检测到 x64 Microsoft.WindowsDesktop.App 8。请先离线安装 x64 .NET 8 Desktop Runtime，然后重试。安装程序不会联网或自动安装运行时。" />
+
+    <Icon Id="SwSearchIcon" SourceFile="$(var.PayloadDir)\SwSearch.App.exe" />
+    <Property Id="ARPPRODUCTICON" Value="SwSearchIcon" />
+
+    <Binary Id="SwSearchInstallerCoordinator" SourceFile="$(var.CoordinatorBinaryPath)" />
+    <Binary Id="SwSearchInstallerMsiBridge" SourceFile="$(var.MsiBridgeBinaryPath)" />
+    <CustomAction Id="CheckSwSearchDotNet8"
+                  BinaryRef="SwSearchInstallerMsiBridge"
+                  DllEntry="CheckSwSearchDotNet8"
+                  Execute="immediate"
+                  Impersonate="yes"
+                  Return="check" />
+    <CustomAction Id="CaptureSwSearchTrustedContext"
+                  BinaryRef="SwSearchInstallerMsiBridge"
+                  DllEntry="CaptureTrustedInstallerContext"
+                  Execute="immediate"
+                  Impersonate="yes"
+                  Return="check" />
+    <CustomAction Id="SwSearchUserIpc"
+                  BinaryRef="SwSearchInstallerCoordinator"
+                  ExeCommand="--user-ipc --upgrade-code &quot;{D9158356-29B3-44D6-A15A-ACDCE8328703}&quot; --current-root &quot;[SWSEARCHTRUSTEDROOTPOLICY]&quot; --log &quot;[TempFolder]SwSearch-InstallerCoordinator.log&quot; --install-user-sid &quot;[SWSEARCHTRUSTEDSID]&quot; --install-session-id &quot;[SWSEARCHTRUSTEDSESSIONID]&quot; --instance-nonce &quot;[SWSEARCHSESSIONNONCE]&quot; --install-action &quot;[SWSEARCHINSTALLACTION]&quot; --deadline-tick &quot;[SWSEARCHDEADLINETICK]&quot;"
+                  Execute="immediate"
+                  Impersonate="yes"
+                  HideTarget="yes"
+                  Return="ignore" />
+    <CustomAction Id="SetSwSearchPrivilegedHandleData"
+                  Property="SwSearchPrivilegedHandle"
+                  Value="v=2;user=0;sid=;session=;upgrade={D9158356-29B3-44D6-A15A-ACDCE8328703};nonce=;root=[SWSEARCHTRUSTEDROOTPOLICY];action=[SWSEARCHINSTALLACTION];deadline=[SWSEARCHDEADLINETICK]"
+                  Execute="immediate"
+                  HideTarget="yes"
+                  Return="check" />
+    <CustomAction Id="SwSearchPrivilegedHandle"
+                  BinaryRef="SwSearchInstallerCoordinator"
+                  ExeCommand="--privileged-handle --custom-action-data &quot;[SwSearchPrivilegedHandle]&quot;"
+                  Execute="deferred"
+                  Impersonate="no"
+                  HideTarget="yes"
+                  Return="ignore" />
+    <CustomAction Id="SetInstallModernMenuCertificateData"
+                  Property="InstallModernMenuCertificate"
+                  Value="$(var.ModernMenuCertificateThumbprint)|[INSTALLFOLDER]SwSearch.ModernContextMenu.cer"
+                  Execute="immediate"
+                  HideTarget="yes"
+                  Return="check" />
+    <CustomAction Id="InstallModernMenuCertificate"
+                  BinaryRef="SwSearchInstallerMsiBridge"
+                  DllEntry="InstallModernMenuCertificate"
+                  Execute="deferred"
+                  Impersonate="no"
+                  HideTarget="yes"
+                  Return="check" />
+    <CustomAction Id="SetRemoveModernMenuCertificateData"
+                  Property="RemoveModernMenuCertificate"
+                  Value="$(var.ModernMenuCertificateThumbprint)"
+                  Execute="immediate"
+                  HideTarget="yes"
+                  Return="check" />
+    <CustomAction Id="RemoveModernMenuCertificate"
+                  BinaryRef="SwSearchInstallerMsiBridge"
+                  DllEntry="RemoveModernMenuCertificate"
+                  Execute="deferred"
+                  Impersonate="no"
+                  HideTarget="yes"
+                  Return="check" />
+    <CustomAction Id="RegisterModernContextMenu"
+                  FileRef="SwSearchModernMenuRegistrationFile"
+                  ExeCommand="--enable-local"
+                  Execute="immediate"
+                  Impersonate="yes"
+                  Return="ignore" />
+    <CustomAction Id="UnregisterModernContextMenu"
+                  FileRef="SwSearchModernMenuRegistrationFile"
+                  ExeCommand="--disable"
+                  Execute="immediate"
+                  Impersonate="yes"
+                  Return="check" />
+    <util:CloseApplication Id="DetectSolidWorks" Target="SLDWORKS.exe" CloseMessage="no"
+                           Property="SOLIDWORKS_RUNNING" RebootPrompt="no" Timeout="1" Sequence="10" />
+    <CustomAction Id="FailIfSolidWorksRunning"
+                  Error="安装或升级 Taskpane 前必须关闭 SOLIDWORKS。安装程序不会启动、附加或强制关闭 SOLIDWORKS。" />
+    <InstallUISequence>
+      <Custom Action="CheckSwSearchDotNet8" Condition="1" Before="LaunchConditions" />
+    </InstallUISequence>
+    <InstallExecuteSequence>
+      <Custom Action="CheckSwSearchDotNet8" Condition="1" Before="LaunchConditions" />
+      <Custom Action="CaptureSwSearchTrustedContext"
+              Condition="NOT MSIPATCHREMOVE AND NOT UPGRADINGPRODUCTCODE AND (NOT Installed OR REINSTALL OR REMOVE~=&quot;ALL&quot; OR (Installed AND NOT REMOVE~=&quot;ALL&quot;))"
+              After="CostFinalize" />
+      <Custom Action="SwSearchUserIpc"
+              Condition="SWSEARCHCONTEXTREADY = &quot;1&quot; AND NOT MSIPATCHREMOVE AND NOT UPGRADINGPRODUCTCODE AND (NOT Installed OR REINSTALL OR REMOVE~=&quot;ALL&quot; OR (Installed AND NOT REMOVE~=&quot;ALL&quot;))"
+              After="CaptureSwSearchTrustedContext" />
+      <Custom Action="UnregisterModernContextMenu"
+              Condition="REMOVE~=&quot;ALL&quot; AND NOT UPGRADINGPRODUCTCODE"
+              After="SwSearchUserIpc" />
+      <Custom Action="override Wix4CloseApplications_$(sys.BUILDARCHSHORT)"
+              Condition="VersionNT &gt; 400"
+              After="SwSearchUserIpc" />
+      <Custom Action="FailIfSolidWorksRunning" Condition="SOLIDWORKS_RUNNING" Before="InstallValidate" />
+      <Custom Action="SetSwSearchPrivilegedHandleData"
+              Condition="SWSEARCHMACHINECONTEXTREADY = &quot;1&quot; AND NOT MSIPATCHREMOVE AND NOT UPGRADINGPRODUCTCODE AND (NOT Installed OR REINSTALL OR REMOVE~=&quot;ALL&quot; OR (Installed AND NOT REMOVE~=&quot;ALL&quot;))"
+              Before="InstallInitialize" />
+      <Custom Action="SetInstallModernMenuCertificateData"
+              Condition="NOT REMOVE~=&quot;ALL&quot;"
+              Before="InstallInitialize" />
+      <Custom Action="SetRemoveModernMenuCertificateData"
+              Condition="REMOVE~=&quot;ALL&quot; AND NOT UPGRADINGPRODUCTCODE"
+              Before="InstallInitialize" />
+    <Custom Action="SwSearchPrivilegedHandle"
+            Condition="SWSEARCHMACHINECONTEXTREADY = &quot;1&quot; AND NOT MSIPATCHREMOVE AND NOT UPGRADINGPRODUCTCODE AND (NOT Installed OR REINSTALL OR REMOVE~=&quot;ALL&quot; OR (Installed AND NOT REMOVE~=&quot;ALL&quot;))"
+            After="InstallInitialize" />
+      <Custom Action="RemoveModernMenuCertificate"
+              Condition="REMOVE~=&quot;ALL&quot; AND NOT UPGRADINGPRODUCTCODE"
+              Before="RemoveFiles" />
+      <Custom Action="InstallModernMenuCertificate"
+              Condition="NOT REMOVE~=&quot;ALL&quot;"
+              After="InstallFiles" />
+      <Custom Action="RegisterModernContextMenu"
+              Condition="NOT REMOVE~=&quot;ALL&quot;"
+              After="RemoveExistingProducts" />
+    </InstallExecuteSequence>
+
+    <Feature Id="MainFeature" Title="SOLIDWORKS 文件检索（必需）"
+             Description="主程序、Broker、元数据工作进程、属性查看器和 SOLIDWORKS Taskpane。" Level="1" Display="hidden">
+      <ComponentGroupRef Id="ApplicationFiles" />
+      <ComponentRef Id="StartMenuShortcutComponent" />
+      <ComponentRef Id="SwSearchProductFileAnchor" />
+      <ComponentRef Id="SolidWorksAddinMachineRegistration" />
+      <ComponentRef Id="SolidWorksAddinUserStartup" />
+      <ComponentRef Id="LegacyDrawingPropertyVerbCleanup" />
+    </Feature>
+    <Feature Id="ContextMenuFeature" Title="资源管理器右键菜单"
+             Description="文件属性菜单和文件夹范围搜索菜单；均为当前用户静态 verb。" Level="1">
+      <ComponentRef Id="ContextMenuSldprt" />
+      <ComponentRef Id="ContextMenuSldasm" />
+      <ComponentRef Id="ContextMenuFolder" />
+      <ComponentRef Id="ContextMenuFolderBackground" />
+    </Feature>
+    <Feature Id="DesktopShortcutFeature" Title="桌面快捷方式" Description="为所有用户创建桌面快捷方式。" Level="2">
+      <ComponentRef Id="DesktopShortcutComponent" />
+    </Feature>
+
+    <ui:WixUI Id="WixUI_FeatureTree" InstallDirectory="INSTALLFOLDER" />
+  </Package>
+
+  <Fragment>
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="SwSearch" />
+    </StandardDirectory>
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="ApplicationProgramsFolder" Name="SOLIDWORKS 文件检索" />
+    </StandardDirectory>
+    <StandardDirectory Id="DesktopFolder" />
+  </Fragment>
+
+  <Fragment>
+    <Component Id="SwSearchProductFileAnchor" Directory="INSTALLFOLDER"
+               Guid="{6D2AD688-FFB4-4B79-99A7-AB07DE8291D6}" Bitness="always64">
+      <File Id="SwSearchProductAnchorFile" Source="$(sys.SOURCEFILEDIR)..\SwSearch.InstallAnchor.dat"
+            Name="SwSearch.InstallAnchor.dat" KeyPath="yes" />
+    </Component>
+
+    <Component Id="StartMenuShortcutComponent" Directory="ApplicationProgramsFolder" Guid="{43DA1C5E-265E-4AC4-A7E0-8A73CF173A20}">
+      <Shortcut Id="StartMenuShortcut" Name="SOLIDWORKS 文件检索" Description="搜索 SOLIDWORKS 文件名和属性"
+                Target="[INSTALLFOLDER]SwSearch.App.exe" WorkingDirectory="INSTALLFOLDER" Icon="SwSearchIcon" />
+      <RemoveFolder Id="RemoveApplicationProgramsFolder" On="uninstall" />
+      <RegistryValue Root="HKLM" Key="Software\SwSearch\Installer" Name="StartMenuShortcut" Type="integer" Value="1" KeyPath="yes" />
+      <RegistryValue Root="HKLM" Key="Software\SwSearch\Installer" Name="InstallDirectory" Type="string" Value="[INSTALLFOLDER]" />
+    </Component>
+
+    <Component Id="DesktopShortcutComponent" Directory="DesktopFolder" Guid="{1861047B-1677-44FB-947F-18567F5046D0}">
+      <Shortcut Id="DesktopShortcut" Name="SOLIDWORKS 文件检索" Description="搜索 SOLIDWORKS 文件名和属性"
+                Target="[INSTALLFOLDER]SwSearch.App.exe" WorkingDirectory="INSTALLFOLDER" Icon="SwSearchIcon" />
+      <RegistryValue Root="HKLM" Key="Software\SwSearch\Installer" Name="DesktopShortcut" Type="integer" Value="1" KeyPath="yes" />
+    </Component>
+
+    <Component Id="SolidWorksAddinMachineRegistration" Directory="INSTALLFOLDER" Guid="{803F2915-9AAE-4B38-861B-A90D723FF571}" Bitness="always64">
+      <RegistryKey Root="HKLM" Key="SOFTWARE\SolidWorks\Addins\{F3A7CC42-C6E5-4CF8-96D6-2D1F1AA1B61D}">
+        <RegistryValue Type="integer" Value="0" KeyPath="yes" />
+        <RegistryValue Name="Title" Type="string" Value="SOLIDWORKS 文件检索" />
+        <RegistryValue Name="Description" Type="string" Value="在 SOLIDWORKS 右侧任务窗格中搜索零件、装配体和工程图" />
+      </RegistryKey>
+      <RegistryKey Root="HKLM" Key="Software\Classes\CLSID\{F3A7CC42-C6E5-4CF8-96D6-2D1F1AA1B61D}">
+        <RegistryValue Type="string" Value="SwSearch SOLIDWORKS Taskpane Add-in" />
+      </RegistryKey>
+      <RegistryKey Root="HKLM" Key="Software\Classes\CLSID\{F3A7CC42-C6E5-4CF8-96D6-2D1F1AA1B61D}\InprocServer32">
+        <RegistryValue Type="string" Value="[System64Folder]mscoree.dll" />
+        <RegistryValue Name="ThreadingModel" Type="string" Value="Both" />
+        <RegistryValue Name="Class" Type="string" Value="SwSearch.SolidWorksAddin.SwAddin" />
+        <RegistryValue Name="Assembly" Type="string" Value="SwSearch.SolidWorksAddin, Version=$(var.ProductVersion).0, Culture=neutral, PublicKeyToken=null" />
+        <RegistryValue Name="RuntimeVersion" Type="string" Value="v4.0.30319" />
+        <RegistryValue Name="CodeBase" Type="string" Value="file:///[INSTALLFOLDER]SwSearch.SolidWorksAddin.dll" />
+      </RegistryKey>
+      <RegistryKey Root="HKLM" Key="Software\Classes\CLSID\{F3A7CC42-C6E5-4CF8-96D6-2D1F1AA1B61D}\InprocServer32\$(var.ProductVersion).0">
+        <RegistryValue Name="Class" Type="string" Value="SwSearch.SolidWorksAddin.SwAddin" />
+        <RegistryValue Name="Assembly" Type="string" Value="SwSearch.SolidWorksAddin, Version=$(var.ProductVersion).0, Culture=neutral, PublicKeyToken=null" />
+        <RegistryValue Name="RuntimeVersion" Type="string" Value="v4.0.30319" />
+        <RegistryValue Name="CodeBase" Type="string" Value="file:///[INSTALLFOLDER]SwSearch.SolidWorksAddin.dll" />
+      </RegistryKey>
+      <RegistryValue Root="HKLM" Key="Software\Classes\CLSID\{F3A7CC42-C6E5-4CF8-96D6-2D1F1AA1B61D}\ProgId"
+                     Type="string" Value="SwSearch.SolidWorksAddin" />
+      <RegistryValue Root="HKLM" Key="Software\Classes\CLSID\{F3A7CC42-C6E5-4CF8-96D6-2D1F1AA1B61D}\Implemented Categories\{62C8FE65-4EBB-45E7-B440-6E39B2CDBF29}"
+                     Type="string" Value="" />
+      <RegistryValue Root="HKLM" Key="Software\Classes\SwSearch.SolidWorksAddin" Type="string" Value="SwSearch SOLIDWORKS Taskpane Add-in" />
+      <RegistryValue Root="HKLM" Key="Software\Classes\SwSearch.SolidWorksAddin\CLSID" Type="string" Value="{F3A7CC42-C6E5-4CF8-96D6-2D1F1AA1B61D}" />
+    </Component>
+
+    <Component Id="SolidWorksAddinUserStartup" Directory="INSTALLFOLDER" Guid="{10E47267-D318-49E9-B681-0181FB13B30B}" NeverOverwrite="yes">
+      <RegistryValue Root="HKCU" Key="Software\SolidWorks\AddInsStartup\{F3A7CC42-C6E5-4CF8-96D6-2D1F1AA1B61D}"
+                     Type="integer" Value="1" KeyPath="yes" />
+    </Component>
+
+    <!-- The old component is absent from this major upgrade. Remove only the
+         product-owned verb, never the .slddrw association or sibling verbs. -->
+    <Component Id="LegacyDrawingPropertyVerbCleanup" Directory="INSTALLFOLDER"
+               Guid="{CFF2D75B-6BA5-49F0-8D58-9986D1952D42}"
+               Condition="WIX_UPGRADE_DETECTED">
+      <RegistryValue Root="HKCU" Key="Software\SwSearch\Installer"
+                     Name="LegacyDrawingPropertyVerbCleanup" Type="integer" Value="1" KeyPath="yes" />
+      <RemoveRegistryKey Root="HKCU"
+                         Key="Software\Classes\SystemFileAssociations\.slddrw\shell\SwSearch.ViewProperties"
+                         Action="removeOnInstall" />
+    </Component>
+
+    <Component Id="ContextMenuFolder" Directory="INSTALLFOLDER" Guid="{D8EA388D-C8C8-40D7-B7C4-F491264E1BF6}" Condition="WindowsBuild &lt; 22000">
+      <RegistryKey Root="HKCU" Key="Software\Classes\Directory\shell\SwSearch.SearchHere">
+        <RegistryValue Type="string" Value="使用 SOLIDWORKS 文件检索此文件夹" KeyPath="yes" />
+        <RegistryValue Name="MUIVerb" Type="string" Value="使用 SOLIDWORKS 文件检索此文件夹" />
+        <RegistryValue Name="Icon" Type="string" Value="&quot;[INSTALLFOLDER]SwSearch.App.exe&quot;,0" />
+      </RegistryKey>
+      <RegistryValue Root="HKCU" Key="Software\Classes\Directory\shell\SwSearch.SearchHere\command"
+                     Type="string" Value="&quot;[INSTALLFOLDER]SwSearch.App.exe&quot; --scope-folder &quot;%1&quot;" />
+    </Component>
+    <Component Id="ContextMenuFolderBackground" Directory="INSTALLFOLDER" Guid="{2CF2FD0A-385B-4CD7-9F87-2D995391B1DD}" Condition="WindowsBuild &lt; 22000">
+      <RegistryKey Root="HKCU" Key="Software\Classes\Directory\Background\shell\SwSearch.SearchHere">
+        <RegistryValue Type="string" Value="使用 SOLIDWORKS 文件检索此文件夹" KeyPath="yes" />
+        <RegistryValue Name="MUIVerb" Type="string" Value="使用 SOLIDWORKS 文件检索此文件夹" />
+        <RegistryValue Name="Icon" Type="string" Value="&quot;[INSTALLFOLDER]SwSearch.App.exe&quot;,0" />
+      </RegistryKey>
+      <RegistryValue Root="HKCU" Key="Software\Classes\Directory\Background\shell\SwSearch.SearchHere\command"
+                     Type="string" Value="&quot;[INSTALLFOLDER]SwSearch.App.exe&quot; --scope-folder &quot;%V&quot;" />
+    </Component>
+
+    <Component Id="ContextMenuSldprt" Directory="INSTALLFOLDER" Guid="{A342C97F-F86C-42DD-84E8-98D4E005F931}" Condition="WindowsBuild &lt; 22000">
+      <RegistryKey Root="HKCU" Key="Software\Classes\SystemFileAssociations\.sldprt\shell\SwSearch.ViewProperties">
+        <RegistryValue Type="string" Value="查看 SOLIDWORKS 属性" KeyPath="yes" />
+        <RegistryValue Name="MUIVerb" Type="string" Value="查看 SOLIDWORKS 属性" />
+        <RegistryValue Name="Icon" Type="string" Value="&quot;[INSTALLFOLDER]SwSearch.PropertyViewer.exe&quot;,0" />
+      </RegistryKey>
+      <RegistryValue Root="HKCU" Key="Software\Classes\SystemFileAssociations\.sldprt\shell\SwSearch.ViewProperties\command"
+                     Type="string" Value="&quot;[INSTALLFOLDER]SwSearch.PropertyViewer.exe&quot; &quot;%1&quot;" />
+    </Component>
+    <Component Id="ContextMenuSldasm" Directory="INSTALLFOLDER" Guid="{561FA90C-8D14-47D2-9246-35FB28B235EA}" Condition="WindowsBuild &lt; 22000">
+      <RegistryKey Root="HKCU" Key="Software\Classes\SystemFileAssociations\.sldasm\shell\SwSearch.ViewProperties">
+        <RegistryValue Type="string" Value="查看 SOLIDWORKS 属性" KeyPath="yes" />
+        <RegistryValue Name="MUIVerb" Type="string" Value="查看 SOLIDWORKS 属性" />
+        <RegistryValue Name="Icon" Type="string" Value="&quot;[INSTALLFOLDER]SwSearch.PropertyViewer.exe&quot;,0" />
+      </RegistryKey>
+      <RegistryValue Root="HKCU" Key="Software\Classes\SystemFileAssociations\.sldasm\shell\SwSearch.ViewProperties\command"
+                     Type="string" Value="&quot;[INSTALLFOLDER]SwSearch.PropertyViewer.exe&quot; &quot;%1&quot;" />
+    </Component>
+  </Fragment>
+</Wix>

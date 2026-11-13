@@ -1,0 +1,286 @@
+<Project TreatAsLocalProperty="_ExpectedRestoreConfigFile;_ExpectedRestorePackagesPath;_ExpectedRestoreSources;_ExpectedMSBuildSDKsPath;_ExpectedMSBuildExtensionsPath;_ExpectedDirectoryBuildPropsPath;_ExpectedTestResultsPathPrefix;_ExpectedTestResultsPathPrefixUpper;_ActualRestoreConfigFile;_ActualRestorePackagesPath;_ActualRestoreSources;_ActualNuGetPackages;_ActualMSBuildSDKsPath;_ActualMSBuildExtensionsPath;_ActualMSBuildUserExtensionsPath;_ActualMSBuildUserExtensionsPathUpper;_ActualMSBuildUserExtensionsLeaf;_ActualMSBuildUserExtensionsUnderTestResults;_ActualDirectoryBuildPropsPath">
+  <PropertyGroup>
+    <_ExpectedRestoreConfigFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)NuGet.Offline.config'))</_ExpectedRestoreConfigFile>
+    <_ExpectedRestorePackagesPath>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\.packages-rc48-r3'))</_ExpectedRestorePackagesPath>
+    <_ExpectedRestoreSources>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory).offline-feed'))</_ExpectedRestoreSources>
+    <_ExpectedMSBuildSDKsPath>$([System.IO.Path]::GetFullPath('C:\Program Files\dotnet\sdk\8.0.421\Sdks'))</_ExpectedMSBuildSDKsPath>
+    <_ExpectedMSBuildExtensionsPath>$([System.IO.Path]::GetFullPath('C:\Program Files\dotnet\sdk\8.0.421'))</_ExpectedMSBuildExtensionsPath>
+    <_ExpectedDirectoryBuildPropsPath>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\Directory.Build.props'))</_ExpectedDirectoryBuildPropsPath>
+    <_ExpectedTestResultsPathPrefix>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\TestResults\'))</_ExpectedTestResultsPathPrefix>
+    <_ExpectedTestResultsPathPrefixUpper>$([System.String]::Copy('$(_ExpectedTestResultsPathPrefix)').ToUpperInvariant())</_ExpectedTestResultsPathPrefixUpper>
+    <_ActualRestoreConfigFile />
+    <_ActualRestorePackagesPath />
+    <_ActualRestoreSources />
+    <_ActualNuGetPackages />
+    <_ActualMSBuildSDKsPath />
+    <_ActualMSBuildExtensionsPath />
+    <_ActualMSBuildUserExtensionsPath />
+    <_ActualMSBuildUserExtensionsPathUpper />
+    <_ActualMSBuildUserExtensionsLeaf />
+    <_ActualMSBuildUserExtensionsUnderTestResults>false</_ActualMSBuildUserExtensionsUnderTestResults>
+    <_ActualDirectoryBuildPropsPath />
+    <_ActualRestoreConfigFile Condition="'$(RestoreConfigFile)' != ''">$([System.IO.Path]::GetFullPath('$(RestoreConfigFile)'))</_ActualRestoreConfigFile>
+    <_ActualRestorePackagesPath Condition="'$(RestorePackagesPath)' != ''">$([System.IO.Path]::GetFullPath('$(RestorePackagesPath)'))</_ActualRestorePackagesPath>
+    <_ActualRestoreSources Condition="'$(RestoreSources)' != ''">$([System.IO.Path]::GetFullPath('$(RestoreSources)'))</_ActualRestoreSources>
+    <_ActualNuGetPackages Condition="'$(NUGET_PACKAGES)' != ''">$([System.IO.Path]::GetFullPath('$(NUGET_PACKAGES)'))</_ActualNuGetPackages>
+    <_ActualMSBuildSDKsPath Condition="'$(MSBuildSDKsPath)' != ''">$([System.IO.Path]::GetFullPath('$(MSBuildSDKsPath)'))</_ActualMSBuildSDKsPath>
+    <_ActualMSBuildExtensionsPath Condition="'$(MSBuildExtensionsPath)' != ''">$([System.IO.Path]::GetFullPath('$(MSBuildExtensionsPath)'))</_ActualMSBuildExtensionsPath>
+    <_ActualMSBuildUserExtensionsPath Condition="'$(MSBuildUserExtensionsPath)' != ''">$([System.IO.Path]::GetFullPath('$(MSBuildUserExtensionsPath)'))</_ActualMSBuildUserExtensionsPath>
+    <_ActualMSBuildUserExtensionsPathUpper Condition="'$(_ActualMSBuildUserExtensionsPath)' != ''">$([System.String]::Copy('$(_ActualMSBuildUserExtensionsPath)').ToUpperInvariant())</_ActualMSBuildUserExtensionsPathUpper>
+    <_ActualMSBuildUserExtensionsLeaf Condition="'$(_ActualMSBuildUserExtensionsPath)' != ''">$([System.IO.Path]::GetFileName('$(_ActualMSBuildUserExtensionsPath)'))</_ActualMSBuildUserExtensionsLeaf>
+    <_ActualMSBuildUserExtensionsUnderTestResults Condition="'$(_ActualMSBuildUserExtensionsPathUpper)' != ''">$([System.String]::Copy('$(_ActualMSBuildUserExtensionsPathUpper)').StartsWith('$(_ExpectedTestResultsPathPrefixUpper)'))</_ActualMSBuildUserExtensionsUnderTestResults>
+    <_ActualDirectoryBuildPropsPath Condition="'$(DirectoryBuildPropsPath)' != ''">$([System.IO.Path]::GetFullPath('$(DirectoryBuildPropsPath)'))</_ActualDirectoryBuildPropsPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <PortableRestoreRoot Include="$(MSBuildThisFileDirectory)..\SolidWorksSearch.sln" />
+    <RuntimeRestoreRoot Include="$(MSBuildThisFileDirectory)..\src\SwSearch.App\SwSearch.App.csproj" />
+    <RuntimeRestoreRoot Include="$(MSBuildThisFileDirectory)..\src\SwSearch.Broker\SwSearch.Broker.csproj" />
+    <RuntimeRestoreRoot Include="$(MSBuildThisFileDirectory)..\src\SwSearch.Contracts\SwSearch.Contracts.csproj" />
+    <RuntimeRestoreRoot Include="$(MSBuildThisFileDirectory)..\src\SwSearch.Everything\SwSearch.Everything.csproj" />
+    <RuntimeRestoreRoot Include="$(MSBuildThisFileDirectory)..\src\SwSearch.Indexer\SwSearch.Indexer.csproj" />
+    <RuntimeRestoreRoot Include="$(MSBuildThisFileDirectory)..\src\SwSearch.InstallerCoordinator\SwSearch.InstallerCoordinator.csproj" />
+    <RuntimeRestoreRoot Include="$(MSBuildThisFileDirectory)..\src\SwSearch.Integration\SwSearch.Integration.csproj" />
+    <RuntimeRestoreRoot Include="$(MSBuildThisFileDirectory)..\src\SwSearch.Metadata.Worker\SwSearch.Metadata.Worker.csproj" />
+    <RuntimeRestoreRoot Include="$(MSBuildThisFileDirectory)..\src\SwSearch.PropertyConfig\SwSearch.PropertyConfig.csproj" />
+    <RuntimeRestoreRoot Include="$(MSBuildThisFileDirectory)..\src\SwSearch.PropertyViewer\SwSearch.PropertyViewer.csproj" />
+    <RuntimeRestoreRoot Include="$(MSBuildThisFileDirectory)..\src\SwSearch.ShellRegistration\SwSearch.ShellRegistration.csproj" />
+    <RuntimeRestoreRoot Include="$(MSBuildThisFileDirectory)..\src\SwSearch.WebUi\SwSearch.WebUi.csproj" />
+    <RuntimeRestoreRoot Include="$(MSBuildThisFileDirectory)..\tests\SwSearch.App.Tests\SwSearch.App.Tests.csproj" />
+    <RuntimeRestoreRoot Include="$(MSBuildThisFileDirectory)..\tests\SwSearch.CandidateIlGate\SwSearch.CandidateIlGate.csproj" />
+    <RuntimeRestoreRoot Include="$(MSBuildThisFileDirectory)..\tests\SwSearch.Everything.Tests\SwSearch.Everything.Tests.csproj" />
+    <RuntimeRestoreRoot Include="$(MSBuildThisFileDirectory)..\tests\SwSearch.Indexer.Tests\SwSearch.Indexer.Tests.csproj" />
+    <RuntimeRestoreRoot Include="$(MSBuildThisFileDirectory)..\tests\SwSearch.InstallerCoordinator.NativeHelper\SwSearch.InstallerCoordinator.NativeHelper.csproj" />
+    <RuntimeRestoreRoot Include="$(MSBuildThisFileDirectory)..\tests\SwSearch.InstallerCoordinator.Tests\SwSearch.InstallerCoordinator.Tests.csproj" />
+    <RuntimeRestoreRoot Include="$(MSBuildThisFileDirectory)..\tests\SwSearch.InstallerCoordinator.WatchdogHelper\SwSearch.InstallerCoordinator.WatchdogHelper.csproj" />
+    <RuntimeRestoreRoot Include="$(MSBuildThisFileDirectory)..\tests\SwSearch.Integration.Tests\SwSearch.Integration.Tests.csproj" />
+    <RuntimeRestoreRoot Include="$(MSBuildThisFileDirectory)..\tests\SwSearch.Metadata.Worker.Tests\SwSearch.Metadata.Worker.Tests.csproj" />
+    <RuntimeRestoreRoot Include="$(MSBuildThisFileDirectory)..\tests\SwSearch.PropertyConfig.Tests\SwSearch.PropertyConfig.Tests.csproj" />
+    <RuntimeRestoreRoot Include="$(MSBuildThisFileDirectory)..\tests\SwSearch.PropertyViewer.Tests\SwSearch.PropertyViewer.Tests.csproj" />
+    <RuntimeRestoreRoot Include="$(MSBuildThisFileDirectory)..\tests\SwSearch.ShellRegistration.Tests\SwSearch.ShellRegistration.Tests.csproj" />
+    <InstallerRestoreRoot Include="$(MSBuildThisFileDirectory)wix\SwSearch.Package.wixproj" />
+  </ItemGroup>
+
+  <Target Name="ValidateRestoreBoundaries">
+    <Error Condition="'$(RestoreConfigFile)' != '$(_ExpectedRestoreConfigFile)' Or '$(_ActualRestoreConfigFile)' != '$(_ExpectedRestoreConfigFile)'"
+           Text="RestoreConfigFile must be the canonical frozen offline NuGet config." />
+    <Error Condition="'$(RestorePackagesPath)' != '$(_ExpectedRestorePackagesPath)' Or '$(_ActualRestorePackagesPath)' != '$(_ExpectedRestorePackagesPath)'"
+           Text="RestorePackagesPath must be the new RC48 r3 workspace package folder." />
+    <Error Condition="'$(RestoreSources)' != '$(_ExpectedRestoreSources)' Or '$(_ActualRestoreSources)' != '$(_ExpectedRestoreSources)'"
+           Text="RestoreSources must be the canonical workspace offline feed." />
+    <Error Condition="'$(NUGET_PACKAGES)' != '$(_ExpectedRestorePackagesPath)' Or '$(_ActualNuGetPackages)' != '$(_ExpectedRestorePackagesPath)'"
+           Text="NUGET_PACKAGES must be the same new RC48 r3 workspace package folder." />
+    <Error Condition="'$(MSBuildSDKsPath)' != '$(_ExpectedMSBuildSDKsPath)' Or '$(_ActualMSBuildSDKsPath)' != '$(_ExpectedMSBuildSDKsPath)'"
+           Text="MSBuildSDKsPath must resolve to the frozen .NET SDK 8.0.421 installation." />
+    <Error Condition="'$(MSBuildExtensionsPath)' != '$(_ExpectedMSBuildExtensionsPath)' Or '$(_ActualMSBuildExtensionsPath)' != '$(_ExpectedMSBuildExtensionsPath)'"
+           Text="MSBuildExtensionsPath must resolve to the frozen .NET SDK 8.0.421 installation." />
+    <Error Condition="'$(_ActualMSBuildUserExtensionsPath)' == '' Or '$(MSBuildUserExtensionsPath)' != '$(_ActualMSBuildUserExtensionsPath)' Or '$(_ActualMSBuildUserExtensionsUnderTestResults)' != 'true' Or '$(_ActualMSBuildUserExtensionsLeaf)' != 'msbuild-user-extensions-empty' Or !Exists('$(_ActualMSBuildUserExtensionsPath)')"
+           Text="MSBuildUserExtensionsPath must be the isolated evidence directory under the workspace TestResults root." />
+    <Error Condition="'$(DirectoryBuildPropsPath)' != '$(_ExpectedDirectoryBuildPropsPath)' Or '$(_ActualDirectoryBuildPropsPath)' != '$(_ExpectedDirectoryBuildPropsPath)'"
+           Text="DirectoryBuildPropsPath must resolve to the frozen workspace Directory.Build.props." />
+    <Error Condition="'$(DirectoryBuildTargetsPath)' != ''"
+           Text="DirectoryBuildTargetsPath must be empty for the frozen restore." />
+    <Error Condition="'$(DirectoryPackagesPropsPath)' != ''"
+           Text="DirectoryPackagesPropsPath must be empty for the frozen restore." />
+    <Error Condition="'$(ImportDirectoryBuildTargets)' != 'false'"
+           Text="ImportDirectoryBuildTargets must be false for the frozen restore." />
+    <Error Condition="'$(ImportDirectoryPackagesProps)' != 'false'"
+           Text="ImportDirectoryPackagesProps must be false for the frozen restore." />
+    <Error Condition="'$(ImportProjectExtensionProps)' != 'false'"
+           Text="ImportProjectExtensionProps must be false for the frozen restore." />
+    <Error Condition="'$(ImportProjectExtensionTargets)' != 'false'"
+           Text="ImportProjectExtensionTargets must be false for the frozen restore." />
+    <Error Condition="'$(ImportUserLocationsByWildcardBeforeMicrosoftCommonProps)' != 'false'"
+           Text="ImportUserLocationsByWildcardBeforeMicrosoftCommonProps must be false for the frozen restore." />
+    <Error Condition="'$(ImportUserLocationsByWildcardAfterMicrosoftCommonProps)' != 'false'"
+           Text="ImportUserLocationsByWildcardAfterMicrosoftCommonProps must be false for the frozen restore." />
+    <Error Condition="'$(ImportUserLocationsByWildcardBeforeMicrosoftCommonTargets)' != 'false'"
+           Text="ImportUserLocationsByWildcardBeforeMicrosoftCommonTargets must be false for the frozen restore." />
+    <Error Condition="'$(ImportUserLocationsByWildcardAfterMicrosoftCommonTargets)' != 'false'"
+           Text="ImportUserLocationsByWildcardAfterMicrosoftCommonTargets must be false for the frozen restore." />
+    <Error Condition="'$(ImportUserLocationsByWildcardBeforeMicrosoftCSharpTargets)' != 'false'"
+           Text="ImportUserLocationsByWildcardBeforeMicrosoftCSharpTargets must be false for the frozen restore." />
+    <Error Condition="'$(ImportUserLocationsByWildcardAfterMicrosoftCSharpTargets)' != 'false'"
+           Text="ImportUserLocationsByWildcardAfterMicrosoftCSharpTargets must be false for the frozen restore." />
+    <Error Condition="'$(ExcludeRestorePackageImports)' != 'true'"
+           Text="ExcludeRestorePackageImports must be true for the frozen restore." />
+    <Error Condition="'$(MSBuildEnableWorkloadResolver)' != 'false'"
+           Text="MSBuildEnableWorkloadResolver must be false for the frozen restore." />
+    <Error Condition="'$(RestoreNoCache)' != 'true'"
+           Text="RestoreNoCache must be true for the frozen restore." />
+    <Error Condition="'$(RestoreDisableParallel)' != 'true'"
+           Text="RestoreDisableParallel must be true for the frozen restore." />
+    <Error Condition="'$(RestoreForceEvaluate)' != 'true'"
+           Text="RestoreForceEvaluate must be true for the frozen restore." />
+    <Error Condition="'$(NuGetAudit)' != 'false'"
+           Text="NuGetAudit must be false for the frozen restore." />
+    <Error Condition="'$(RestoreIgnoreFailedSources)' != 'false'"
+           Text="RestoreIgnoreFailedSources must be false for the frozen restore." />
+    <Error Condition="'$(DisableImplicitNuGetFallbackFolder)' != 'true'"
+           Text="DisableImplicitNuGetFallbackFolder must be true for the frozen restore." />
+    <Error Condition="Exists('$(_ExpectedRestorePackagesPath)')"
+           Text="The RC48 r3 workspace package folder must not exist before the one-shot restore." />
+    <Error Condition="'$(RestoreAdditionalProjectSources)' != ''"
+           Text="RestoreAdditionalProjectSources must be empty for the frozen restore." />
+    <Error Condition="'$(RestoreFallbackFolders)' != ''"
+           Text="RestoreFallbackFolders must be empty for the frozen restore." />
+    <Error Condition="'$(RestoreAdditionalProjectFallbackFolders)' != ''"
+           Text="RestoreAdditionalProjectFallbackFolders must be empty for the frozen restore." />
+    <Error Condition="'$(RestoreAdditionalProjectFallbackFoldersExcludes)' != ''"
+           Text="RestoreAdditionalProjectFallbackFoldersExcludes must be empty for the frozen restore." />
+    <Error Condition="'$(RestoreRepositoryPath)' != ''"
+           Text="RestoreRepositoryPath must be empty for the frozen restore." />
+    <Error Condition="'$(RestoreRepositoryPathOverride)' != ''"
+           Text="RestoreRepositoryPathOverride must be empty for the frozen restore." />
+    <Error Condition="'$(RestoreRootConfigDirectory)' != ''"
+           Text="RestoreRootConfigDirectory must be empty for the frozen restore." />
+    <Error Condition="'$(_RestoreSourcesOverride)' != ''"
+           Text="_RestoreSourcesOverride must be empty for the frozen restore." />
+    <Error Condition="'$(_RestoreFallbackFoldersOverride)' != ''"
+           Text="_RestoreFallbackFoldersOverride must be empty for the frozen restore." />
+    <Error Condition="'$(_RestorePackagesPathOverride)' != ''"
+           Text="_RestorePackagesPathOverride must be empty for the frozen restore." />
+    <Error Condition="'$(_RestoreRepositoryPathOverride)' != ''"
+           Text="_RestoreRepositoryPathOverride must be empty for the frozen restore." />
+  </Target>
+
+  <Target Name="Restore" DependsOnTargets="ValidateRestoreBoundaries">
+    <MSBuild Projects="@(PortableRestoreRoot)"
+             Targets="Restore"
+             BuildInParallel="false"
+             RemoveProperties="RuntimeIdentifier;RuntimeIdentifiers;PublishRuntimeIdentifier;SelfContained;SwSearchFrozenRuntimeGraph;RestoreConfigFile;RestorePackagesPath;RestoreSources;NUGET_PACKAGES;MSBuildSDKsPath;MSBuildExtensionsPath;MSBuildUserExtensionsPath;DirectoryBuildPropsPath;DirectoryBuildTargetsPath;DirectoryPackagesPropsPath;ImportDirectoryBuildTargets;ImportDirectoryPackagesProps;ImportProjectExtensionProps;ImportProjectExtensionTargets;ImportUserLocationsByWildcardBeforeMicrosoftCommonProps;ImportUserLocationsByWildcardAfterMicrosoftCommonProps;ImportUserLocationsByWildcardBeforeMicrosoftCommonTargets;ImportUserLocationsByWildcardAfterMicrosoftCommonTargets;ImportUserLocationsByWildcardBeforeMicrosoftCSharpTargets;ImportUserLocationsByWildcardAfterMicrosoftCSharpTargets;ExcludeRestorePackageImports;MSBuildEnableWorkloadResolver;RestoreNoCache;RestoreDisableParallel;RestoreForceEvaluate;NuGetAudit;RestoreIgnoreFailedSources;RestoreAdditionalProjectSources;RestoreFallbackFolders;RestoreAdditionalProjectFallbackFolders;RestoreAdditionalProjectFallbackFoldersExcludes;RestoreRepositoryPath;RestoreRepositoryPathOverride;RestoreRootConfigDirectory;_RestoreSourcesOverride;_RestoreFallbackFoldersOverride;_RestorePackagesPathOverride;_RestoreRepositoryPathOverride;DisableImplicitNuGetFallbackFolder"
+             Properties="RestoreConfigFile=$(RestoreConfigFile);
+                         RestorePackagesPath=$(RestorePackagesPath);
+                         RestoreSources=$(RestoreSources);
+                         NUGET_PACKAGES=$(NUGET_PACKAGES);
+                         MSBuildSDKsPath=$(MSBuildSDKsPath);
+                         MSBuildExtensionsPath=$(MSBuildExtensionsPath);
+                         MSBuildUserExtensionsPath=$(MSBuildUserExtensionsPath);
+                         DirectoryBuildPropsPath=$(DirectoryBuildPropsPath);
+                         DirectoryBuildTargetsPath=;
+                         DirectoryPackagesPropsPath=;
+                         ImportDirectoryBuildTargets=false;
+                         ImportDirectoryPackagesProps=false;
+                         ImportProjectExtensionProps=false;
+                         ImportProjectExtensionTargets=false;
+                         ImportUserLocationsByWildcardBeforeMicrosoftCommonProps=false;
+                         ImportUserLocationsByWildcardAfterMicrosoftCommonProps=false;
+                         ImportUserLocationsByWildcardBeforeMicrosoftCommonTargets=false;
+                         ImportUserLocationsByWildcardAfterMicrosoftCommonTargets=false;
+                         ImportUserLocationsByWildcardBeforeMicrosoftCSharpTargets=false;
+                         ImportUserLocationsByWildcardAfterMicrosoftCSharpTargets=false;
+                         ExcludeRestorePackageImports=true;
+                         MSBuildEnableWorkloadResolver=false;
+                         RestoreNoCache=true;
+                         RestoreDisableParallel=true;
+                         RestoreForceEvaluate=true;
+                         NuGetAudit=false;
+                         RestoreIgnoreFailedSources=false;
+                         RestoreAdditionalProjectSources=;
+                         RestoreFallbackFolders=;
+                         RestoreAdditionalProjectFallbackFolders=;
+                         RestoreAdditionalProjectFallbackFoldersExcludes=;
+                         RestoreRepositoryPath=;
+                         RestoreRepositoryPathOverride=;
+                         RestoreRootConfigDirectory=;
+                         _RestoreSourcesOverride=;
+                         _RestoreFallbackFoldersOverride=;
+                         _RestorePackagesPathOverride=;
+                         _RestoreRepositoryPathOverride=;
+                         DisableImplicitNuGetFallbackFolder=true;
+                         RuntimeIdentifier=;
+                         SelfContained=;
+                         SwSearchFrozenRuntimeGraph=" />
+    <MSBuild Projects="@(RuntimeRestoreRoot)"
+             Targets="Restore"
+             BuildInParallel="false"
+             RemoveProperties="RuntimeIdentifiers;PublishRuntimeIdentifier;RestoreConfigFile;RestorePackagesPath;RestoreSources;NUGET_PACKAGES;MSBuildSDKsPath;MSBuildExtensionsPath;MSBuildUserExtensionsPath;DirectoryBuildPropsPath;DirectoryBuildTargetsPath;DirectoryPackagesPropsPath;ImportDirectoryBuildTargets;ImportDirectoryPackagesProps;ImportProjectExtensionProps;ImportProjectExtensionTargets;ImportUserLocationsByWildcardBeforeMicrosoftCommonProps;ImportUserLocationsByWildcardAfterMicrosoftCommonProps;ImportUserLocationsByWildcardBeforeMicrosoftCommonTargets;ImportUserLocationsByWildcardAfterMicrosoftCommonTargets;ImportUserLocationsByWildcardBeforeMicrosoftCSharpTargets;ImportUserLocationsByWildcardAfterMicrosoftCSharpTargets;ExcludeRestorePackageImports;MSBuildEnableWorkloadResolver;RestoreNoCache;RestoreDisableParallel;RestoreForceEvaluate;NuGetAudit;RestoreIgnoreFailedSources;RestoreAdditionalProjectSources;RestoreFallbackFolders;RestoreAdditionalProjectFallbackFolders;RestoreAdditionalProjectFallbackFoldersExcludes;RestoreRepositoryPath;RestoreRepositoryPathOverride;RestoreRootConfigDirectory;_RestoreSourcesOverride;_RestoreFallbackFoldersOverride;_RestorePackagesPathOverride;_RestoreRepositoryPathOverride;DisableImplicitNuGetFallbackFolder"
+             Properties="RestoreConfigFile=$(RestoreConfigFile);
+                         RestorePackagesPath=$(RestorePackagesPath);
+                         RestoreSources=$(RestoreSources);
+                         NUGET_PACKAGES=$(NUGET_PACKAGES);
+                         MSBuildSDKsPath=$(MSBuildSDKsPath);
+                         MSBuildExtensionsPath=$(MSBuildExtensionsPath);
+                         MSBuildUserExtensionsPath=$(MSBuildUserExtensionsPath);
+                         DirectoryBuildPropsPath=$(DirectoryBuildPropsPath);
+                         DirectoryBuildTargetsPath=;
+                         DirectoryPackagesPropsPath=;
+                         ImportDirectoryBuildTargets=false;
+                         ImportDirectoryPackagesProps=false;
+                         ImportProjectExtensionProps=false;
+                         ImportProjectExtensionTargets=false;
+                         ImportUserLocationsByWildcardBeforeMicrosoftCommonProps=false;
+                         ImportUserLocationsByWildcardAfterMicrosoftCommonProps=false;
+                         ImportUserLocationsByWildcardBeforeMicrosoftCommonTargets=false;
+                         ImportUserLocationsByWildcardAfterMicrosoftCommonTargets=false;
+                         ImportUserLocationsByWildcardBeforeMicrosoftCSharpTargets=false;
+                         ImportUserLocationsByWildcardAfterMicrosoftCSharpTargets=false;
+                         ExcludeRestorePackageImports=true;
+                         MSBuildEnableWorkloadResolver=false;
+                         RestoreNoCache=true;
+                         RestoreDisableParallel=true;
+                         RestoreForceEvaluate=true;
+                         NuGetAudit=false;
+                         RestoreIgnoreFailedSources=false;
+                         RestoreAdditionalProjectSources=;
+                         RestoreFallbackFolders=;
+                         RestoreAdditionalProjectFallbackFolders=;
+                         RestoreAdditionalProjectFallbackFoldersExcludes=;
+                         RestoreRepositoryPath=;
+                         RestoreRepositoryPathOverride=;
+                         RestoreRootConfigDirectory=;
+                         _RestoreSourcesOverride=;
+                         _RestoreFallbackFoldersOverride=;
+                         _RestorePackagesPathOverride=;
+                         _RestoreRepositoryPathOverride=;
+                         DisableImplicitNuGetFallbackFolder=true;
+                         RuntimeIdentifier=win-x64;
+                         SelfContained=false;
+                         SwSearchFrozenRuntimeGraph=true" />
+    <MSBuild Projects="@(InstallerRestoreRoot)"
+             Targets="Restore"
+             BuildInParallel="false"
+             RemoveProperties="RuntimeIdentifier;RuntimeIdentifiers;PublishRuntimeIdentifier;SelfContained;SwSearchFrozenRuntimeGraph;RestoreConfigFile;RestorePackagesPath;RestoreSources;NUGET_PACKAGES;MSBuildSDKsPath;MSBuildExtensionsPath;MSBuildUserExtensionsPath;DirectoryBuildPropsPath;DirectoryBuildTargetsPath;DirectoryPackagesPropsPath;ImportDirectoryBuildTargets;ImportDirectoryPackagesProps;ImportProjectExtensionProps;ImportProjectExtensionTargets;ImportUserLocationsByWildcardBeforeMicrosoftCommonProps;ImportUserLocationsByWildcardAfterMicrosoftCommonProps;ImportUserLocationsByWildcardBeforeMicrosoftCommonTargets;ImportUserLocationsByWildcardAfterMicrosoftCommonTargets;ImportUserLocationsByWildcardBeforeMicrosoftCSharpTargets;ImportUserLocationsByWildcardAfterMicrosoftCSharpTargets;ExcludeRestorePackageImports;MSBuildEnableWorkloadResolver;RestoreNoCache;RestoreDisableParallel;RestoreForceEvaluate;NuGetAudit;RestoreIgnoreFailedSources;RestoreAdditionalProjectSources;RestoreFallbackFolders;RestoreAdditionalProjectFallbackFolders;RestoreAdditionalProjectFallbackFoldersExcludes;RestoreRepositoryPath;RestoreRepositoryPathOverride;RestoreRootConfigDirectory;_RestoreSourcesOverride;_RestoreFallbackFoldersOverride;_RestorePackagesPathOverride;_RestoreRepositoryPathOverride;DisableImplicitNuGetFallbackFolder"
+             Properties="RestoreConfigFile=$(RestoreConfigFile);
+                         RestorePackagesPath=$(RestorePackagesPath);
+                         RestoreSources=$(RestoreSources);
+                         NUGET_PACKAGES=$(NUGET_PACKAGES);
+                         MSBuildSDKsPath=$(MSBuildSDKsPath);
+                         MSBuildExtensionsPath=$(MSBuildExtensionsPath);
+                         MSBuildUserExtensionsPath=$(MSBuildUserExtensionsPath);
+                         DirectoryBuildPropsPath=$(DirectoryBuildPropsPath);
+                         DirectoryBuildTargetsPath=;
+                         DirectoryPackagesPropsPath=;
+                         ImportDirectoryBuildTargets=false;
+                         ImportDirectoryPackagesProps=false;
+                         ImportProjectExtensionProps=false;
+                         ImportProjectExtensionTargets=false;
+                         ImportUserLocationsByWildcardBeforeMicrosoftCommonProps=false;
+                         ImportUserLocationsByWildcardAfterMicrosoftCommonProps=false;
+                         ImportUserLocationsByWildcardBeforeMicrosoftCommonTargets=false;
+                         ImportUserLocationsByWildcardAfterMicrosoftCommonTargets=false;
+                         ImportUserLocationsByWildcardBeforeMicrosoftCSharpTargets=false;
+                         ImportUserLocationsByWildcardAfterMicrosoftCSharpTargets=false;
+                         ExcludeRestorePackageImports=true;
+                         MSBuildEnableWorkloadResolver=false;
+                         RestoreNoCache=true;
+                         RestoreDisableParallel=true;
+                         RestoreForceEvaluate=true;
+                         NuGetAudit=false;
+                         RestoreIgnoreFailedSources=false;
+                         RestoreAdditionalProjectSources=;
+                         RestoreFallbackFolders=;
+                         RestoreAdditionalProjectFallbackFolders=;
+                         RestoreAdditionalProjectFallbackFoldersExcludes=;
+                         RestoreRepositoryPath=;
+                         RestoreRepositoryPathOverride=;
+                         RestoreRootConfigDirectory=;
+                         _RestoreSourcesOverride=;
+                         _RestoreFallbackFoldersOverride=;
+                         _RestorePackagesPathOverride=;
+                         _RestoreRepositoryPathOverride=;
+                         DisableImplicitNuGetFallbackFolder=true;
+                         RuntimeIdentifier=;
+                         SelfContained=;
+                         SwSearchFrozenRuntimeGraph=" />
+  </Target>
+</Project>

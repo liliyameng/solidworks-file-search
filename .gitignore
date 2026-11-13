@@ -1,0 +1,26 @@
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.db
+*.db-shm
+*.db-wal
+artifacts/
+.packages/
+.packages-*/
+NUL.exe
+TestResults/
+out/
+.mimosa/
+.v2c/
+.video_agent/
+
+# ===== 本地构建缓存 / 离线包源（体积过大，不入库；见 README 说明）=====
+.nuget/
+installer/.build/
+installer/.offline-feed/
+installer/offline-feed/
+tests/installer/sandbox/
+installer/restore-assets.lock.json.backup-*
+installer/wix/obj/

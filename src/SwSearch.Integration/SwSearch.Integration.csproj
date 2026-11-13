@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SwSearch.Contracts\SwSearch.Contracts.csproj" />
+    <ProjectReference Include="..\SwSearch.Indexer\SwSearch.Indexer.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Fixed, already-vendored runtime references keep zero-restore UI cache reads executable. -->
+    <Reference Include="SQLitePCLRaw.core">
+      <HintPath>..\..\.packages-rc48-r3\sqlitepclraw.core\2.1.11\lib\netstandard2.0\SQLitePCLRaw.core.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.provider.e_sqlite3">
+      <HintPath>..\..\.packages-rc48-r3\sqlitepclraw.provider.e_sqlite3\2.1.11\lib\net6.0-windows7.0\SQLitePCLRaw.provider.e_sqlite3.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.batteries_v2">
+      <HintPath>..\..\.packages-rc48-r3\sqlitepclraw.bundle_e_sqlite3\2.1.11\lib\netstandard2.0\SQLitePCLRaw.batteries_v2.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+  </ItemGroup>
+</Project>

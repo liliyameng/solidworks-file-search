@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <IsTestProject>true</IsTestProject>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageReference Include="MSTest.TestAdapter" Version="3.5.2" />
+    <PackageReference Include="MSTest.TestFramework" Version="3.5.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\SwSearch.App\SwSearch.App.csproj" />
+    <ProjectReference Include="..\..\src\SwSearch.WebUi\SwSearch.WebUi.csproj" />
+    <Compile Include="..\Shared\WindowsScopePathGolden.cs" Link="WindowsScopePathGolden.cs" />
+  </ItemGroup>
+  <Target Name="BuildAndCopyAppIsolationHelper" BeforeTargets="CoreCompile">
+    <PropertyGroup>
+      <AppIsolationHelperOutput>$(MSBuildThisFileDirectory)..\..\TestResults\AppIsolationHelper\$(Configuration)\</AppIsolationHelperOutput>
+    </PropertyGroup>
+    <MSBuild
+      Projects="..\SwSearch.InstallerCoordinator.NativeHelper\SwSearch.InstallerCoordinator.NativeHelper.csproj"
+      Targets="Build"
+      Properties="Configuration=$(Configuration);Restore=false;OutputPath=$(AppIsolationHelperOutput)" />
+    <ItemGroup>
+      <AppIsolationHelper Include="$(AppIsolationHelperOutput)SwSearch.Broker.exe" />
+      <AppIsolationHelper Include="$(AppIsolationHelperOutput)SwSearch.Broker.dll" />
+      <AppIsolationHelper Include="$(AppIsolationHelperOutput)SwSearch.Broker.deps.json" />
+      <AppIsolationHelper Include="$(AppIsolationHelperOutput)SwSearch.Broker.runtimeconfig.json" />
+    </ItemGroup>
+    <Copy
+      SourceFiles="@(AppIsolationHelper)"
+      DestinationFolder="$(OutputPath)AppIsolationHelper"
+      SkipUnchangedFiles="false" />
+  </Target>
+</Project>

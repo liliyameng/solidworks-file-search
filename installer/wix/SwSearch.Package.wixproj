@@ -1,0 +1,19 @@
+<Project Sdk="WixToolset.Sdk/5.0.2">
+  <PropertyGroup>
+    <OutputType>Package</OutputType>
+    <Platform>x64</Platform>
+    <InstallerPlatform>x64</InstallerPlatform>
+    <ArtifactName Condition="'$(ArtifactName)' == ''">SwSearch-x64-v$(ProductVersion)</ArtifactName>
+    <OutputName>$(ArtifactName)</OutputName>
+    <Cultures>zh-CN</Cultures>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <SuppressValidation>true</SuppressValidation>
+    <DefineConstants>$(DefineConstants);PayloadDir=$(PayloadDir);ProductVersion=$(ProductVersion);ProductCode=$(ProductCode);CoordinatorBinaryPath=$(CoordinatorBinaryPath);MsiBridgeBinaryPath=$(MsiBridgeBinaryPath);ModernMenuCertificateThumbprint=$(ModernMenuCertificateThumbprint)</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Package.wxs" />
+    <Compile Include="$(GeneratedPayloadWxs)" Condition="'$(GeneratedPayloadWxs)' != ''" />
+    <PackageReference Include="WixToolset.UI.wixext" Version="5.0.2" />
+    <PackageReference Include="WixToolset.Util.wixext" Version="5.0.2" />
+  </ItemGroup>
+</Project>

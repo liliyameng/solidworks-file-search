@@ -1,0 +1,727 @@
+{
+    "schema":  2,
+    "offlineConfig":  {
+                          "path":  "installer/NuGet.Offline.config",
+                          "bytes":  384,
+                          "sha256":  "025F5FFA4BC6F5CE801D248F425DAF12BDD8451EBCD345692CD34C9CCD17CD07"
+                      },
+    "sdkResolverConfig":  {
+                              "path":  "NuGet.config",
+                              "bytes":  391,
+                              "sha256":  "6C1ADC320BDB61C12097CF7C5EC28EFAE4FF803853C5032B327F25E399BFB531"
+                          },
+    "restoreGraph":  {
+                         "path":  "installer/RestoreGraph.proj",
+                         "bytes":  27371,
+                         "sha256":  "6A5BBE91CFE65DC3A861AB7151892A4C0AA8FD4DE046E60F342B39DC2504B6A9"
+                     },
+    "offlineFeed":  {
+                        "path":  "installer/.offline-feed",
+                        "fileCount":  50,
+                        "totalBytes":  194634460,
+                        "files":  [
+                                      {
+                                          "path":  "installer/.offline-feed/microsoft.applicationinsights.2.22.0.nupkg",
+                                          "bytes":  1709255,
+                                          "sha256":  "99443ADDAB694F4D2BE3D71AE74B99BB660288B837C9DEABDC7CD3AF2A9CB840"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/microsoft.aspnetcore.app.runtime.win-x64.8.0.27.nupkg",
+                                          "bytes":  12164257,
+                                          "sha256":  "62864CE94E2C40EFF41DC95D9F9B9853ED4E785FD99F72034A74EAEEDE06C65C"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/microsoft.codecoverage.17.11.1.nupkg",
+                                          "bytes":  9139653,
+                                          "sha256":  "D5D2E52B734687CF0FB85619898A53FA2CC0F7A7ADC61537052822C4381DB460"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/microsoft.data.sqlite.8.0.28.nupkg",
+                                          "bytes":  34996,
+                                          "sha256":  "65303DAD1451B739088BE14EEA7A057C6F3507BE03764931C629E45DA3ED7570"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/microsoft.data.sqlite.core.8.0.28.nupkg",
+                                          "bytes":  297400,
+                                          "sha256":  "5671A7437B571B6E9E3F873334379ABC1E2E74ECEFD5AC3352C363705A2850ED"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/microsoft.net.illink.tasks.8.0.27.nupkg",
+                                          "bytes":  1457682,
+                                          "sha256":  "B764791E12A062DCD45FCDF50C2C65024CFF406CB3D6D99D72A893DB804EFC53"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/microsoft.net.test.sdk.17.11.1.nupkg",
+                                          "bytes":  34301,
+                                          "sha256":  "D09504B9C43697368F824AE39BF3452C14DBA94D5D7E1BE13774E5DE6A04EA62"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/microsoft.netcore.app.runtime.win-x64.8.0.27.nupkg",
+                                          "bytes":  36119083,
+                                          "sha256":  "C408C041F72C92D8CA4FE3D319A29A08420ECA4CFC1D0DBC56B743A2EFF697D4"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/microsoft.testing.extensions.telemetry.1.3.2.nupkg",
+                                          "bytes":  633609,
+                                          "sha256":  "ABA64669F3293371EE9C7B635404DC21AFA03D433579FE32DC3A3C4B27F6A5AE"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/microsoft.testing.extensions.trxreport.abstractions.1.3.2.nupkg",
+                                          "bytes":  685159,
+                                          "sha256":  "D3E3B8D2FCA01285F42B6343312BF5CC50781F5D2CBB4140035413AB38B529C0"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/microsoft.testing.extensions.vstestbridge.1.3.2.nupkg",
+                                          "bytes":  808884,
+                                          "sha256":  "1FC74AFFE4B7F665D95A733D741D02421BB6DEF403F494406878AF9EEB540C46"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/microsoft.testing.platform.1.3.2.nupkg",
+                                          "bytes":  2846232,
+                                          "sha256":  "D47DF89D2A5D48BF8FF751796278EBF39F7478D15C9BED51A76EEF61C971D977"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/microsoft.testing.platform.msbuild.1.3.2.nupkg",
+                                          "bytes":  1252981,
+                                          "sha256":  "D5255356FAC5A92B4AA31B904AA68A06E2A9FAA0C7664093A481023EE1047502"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/microsoft.testplatform.objectmodel.17.10.0.nupkg",
+                                          "bytes":  1654989,
+                                          "sha256":  "DD88D518ADB310E6E4B0119883C6FF0AAA0980B4358D4BF818258D8C384B461E"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/microsoft.testplatform.objectmodel.17.11.1.nupkg",
+                                          "bytes":  1660096,
+                                          "sha256":  "E6F5FEBC2CC56374BBC5F31522FF0E94C305B5D79D5BD50827373458473EBE6E"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/microsoft.testplatform.testhost.17.11.1.nupkg",
+                                          "bytes":  2882099,
+                                          "sha256":  "C12918D07D5F400AB41F72DC293E2EED8E51CE10003DAEB2B9E54DF3883C1F15"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/microsoft.web.webview2.1.0.4078.44.nupkg",
+                                          "bytes":  9258495,
+                                          "sha256":  "DC4D1D9168DF26B830398303E50210B6E1729F6CE5A7AC69D2C766852F489962"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/microsoft.windowsdesktop.app.runtime.win-x64.8.0.27.nupkg",
+                                          "bytes":  36800499,
+                                          "sha256":  "D1BDBE3D193802613E0B0BD08261EAD3BF963D39C22DBEB347CFC2F56B16FD59"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/mstest.testadapter.3.5.2.nupkg",
+                                          "bytes":  4420219,
+                                          "sha256":  "B5B29112A7BDC394E48626F801F591F6F07B0D82E6BC08C4A2FF143360F6800D"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/mstest.testframework.3.5.2.nupkg",
+                                          "bytes":  2939451,
+                                          "sha256":  "66E7704CC361C5BC5E84BCFD8423A0AE14F37A056CE0FE9ABD4A4589ECFEBB5D"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/newtonsoft.json.13.0.1.nupkg",
+                                          "bytes":  2065787,
+                                          "sha256":  "2B6B52556E27E1B7913F33EEDEB95568110C746BD64AFFF74357F1683878323A"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/sqlitepclraw.bundle_e_sqlite3.2.1.11.nupkg",
+                                          "bytes":  39248,
+                                          "sha256":  "91645AA4C4D511F71CD03C6723D022D7E470000711DBE1D4BBE585F8E78B242B"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/sqlitepclraw.bundle_e_sqlite3.2.1.6.nupkg",
+                                          "bytes":  37656,
+                                          "sha256":  "7590FF6D9B185E33AEE3A647E58FF0821D2E8473AA2310BE4BED1E70A86BEF5F"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/sqlitepclraw.core.2.1.11.nupkg",
+                                          "bytes":  36180,
+                                          "sha256":  "B3F7F112862535FF5CD82E0766E78CCCF081BE98958835654A983B7A90741976"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/sqlitepclraw.core.2.1.6.nupkg",
+                                          "bytes":  34519,
+                                          "sha256":  "4715A39B9D8F766315F7C7600F2D010A917DF3CF81B2C45952000B2EFED31FF1"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/sqlitepclraw.lib.e_sqlite3.2.1.11.nupkg",
+                                          "bytes":  20981758,
+                                          "sha256":  "6667DF6C73609CB51DB0F6E29229440228715E5D4C79D2014355F3B7DDB6E81C"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/sqlitepclraw.lib.e_sqlite3.2.1.6.nupkg",
+                                          "bytes":  16588105,
+                                          "sha256":  "B87B7977E48552449DE960FB4E0D09DDEF1E568C72FC533FB783C091CF4F253D"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/sqlitepclraw.provider.e_sqlite3.2.1.11.nupkg",
+                                          "bytes":  60827,
+                                          "sha256":  "2DD7D5DF6E409988013B09B03FB30D67130966434EE9BC2B1EF07A0B94B222D0"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/sqlitepclraw.provider.e_sqlite3.2.1.6.nupkg",
+                                          "bytes":  58749,
+                                          "sha256":  "CC773F619B1DEF6797948F1B6B5B6FE7C1D9594222CA325AC6AD8208FD6141EF"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/system.diagnostics.diagnosticsource.5.0.0.nupkg",
+                                          "bytes":  306864,
+                                          "sha256":  "EA65B737A16F71D347FE9079F2997EA4548219683268FE217D5B42FD23160D5E"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/system.memory.4.5.3.nupkg",
+                                          "bytes":  154054,
+                                          "sha256":  "0AF97B45B45B46EF6A2B37910568DABD492C793DA3859054595D523E2A545859"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/system.reflection.metadata.1.6.0.nupkg",
+                                          "bytes":  852113,
+                                          "sha256":  "2497E068F6AFED47C4878C9101074684B645D5BAEBD2D5163E5EAA99F356ABF1"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/wixtoolset.bal.wixext.5.0.2.nupkg",
+                                          "bytes":  1689093,
+                                          "sha256":  "22422B50A925477E33C2B5F78D2965A9A09C6622D17BA5AA5365B20EC662B7C8"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/wixtoolset.sdk.5.0.2.nupkg",
+                                          "bytes":  20063791,
+                                          "sha256":  "E0F1F6003BABB38772E5791B0F41705DD324C74DCED9DA5F6E67D20A411867D8"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/wixtoolset.ui.wixext.5.0.2.nupkg",
+                                          "bytes":  795434,
+                                          "sha256":  "5EF2C707614B9F70B6BBADD2D4ABCB4124EFEE215E9B16BFBC80113079A604C7"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/wixtoolset.util.wixext.5.0.2.nupkg",
+                                          "bytes":  888252,
+                                          "sha256":  "DDA1CC1B4D3B2305B1246F167C6AF6FCDED5000BE84B3BBFF3DDA4F442BF4740"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/xunit.2.9.2.nupkg",
+                                          "bytes":  31616,
+                                          "sha256":  "879FB24D37C29A89023F2E25A9D130F111B3425AE5B10016DC09B4261D2AEE8A"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/xunit.2.9.3.nupkg",
+                                          "bytes":  31659,
+                                          "sha256":  "04FAE949B8E5201ECFA07FA8702BACA8C0EB3198114194B3793789CC72BF23D7"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/xunit.abstractions.2.0.3.nupkg",
+                                          "bytes":  75155,
+                                          "sha256":  "D03D72FC2DF8880448F7A81BDDB00E1BCB5C18F323C7E7CC69B4CFA727469403"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/xunit.analyzers.1.16.0.nupkg",
+                                          "bytes":  263548,
+                                          "sha256":  "3F906F97D86F1EF17C298D5858B838B4A898C657D19E61F22F5E237D20020DA5"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/xunit.analyzers.1.18.0.nupkg",
+                                          "bytes":  269902,
+                                          "sha256":  "0CE81A98B9DF8BD51AE480E6DC9566F4C68E15B4926E6AB997C8F634F3B7A9DD"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/xunit.assert.2.9.2.nupkg",
+                                          "bytes":  244587,
+                                          "sha256":  "104EABE76E90E1C1E7D0EBAB7F510DA57677ECB8FF3F6B8DBE89C782975C9EAE"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/xunit.assert.2.9.3.nupkg",
+                                          "bytes":  246078,
+                                          "sha256":  "BC760E75EF1B775D293A6AFB89301836D3E5A87CEC265E31DEDD430EE61D0C20"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/xunit.core.2.9.2.nupkg",
+                                          "bytes":  33509,
+                                          "sha256":  "CE18D5D48E7187444572481310AEF6B4890BC5597808F9AD7ABD9407EFA8C9EF"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/xunit.core.2.9.3.nupkg",
+                                          "bytes":  33553,
+                                          "sha256":  "AA4550F09C3F2D95A6C62AE43CEC22AF2EDBBD99F722E691CEEFECA761FC6A7C"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/xunit.extensibility.core.2.9.2.nupkg",
+                                          "bytes":  298693,
+                                          "sha256":  "310002FF877AECDB2CBB747EA473E1EAF1E2B415D06311046645553065BBDB47"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/xunit.extensibility.core.2.9.3.nupkg",
+                                          "bytes":  298787,
+                                          "sha256":  "99CA555FE9B447B1747AFF426819DB6A2F60B6EE0655CAA28C4B91A9EF3D0F48"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/xunit.extensibility.execution.2.9.2.nupkg",
+                                          "bytes":  379785,
+                                          "sha256":  "7FEF547E83F22B72480E14125B462EF5CE0F1AA52A642F7A0CC20D0988B68BCD"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/xunit.extensibility.execution.2.9.3.nupkg",
+                                          "bytes":  379849,
+                                          "sha256":  "DABC4CB360EDE1C01C98E14CC0FE587774693F40679A22FC71794ACAC5D8D23C"
+                                      },
+                                      {
+                                          "path":  "installer/.offline-feed/xunit.runner.visualstudio.2.8.2.nupkg",
+                                          "bytes":  595969,
+                                          "sha256":  "5257CADF8F2BF2426EADACB07DD0ADA492711E4BF4E303CDCE951ACF850CFFAD"
+                                      }
+                                  ]
+                    },
+    "packageFolder":  {
+                          "path":  ".packages-rc48-r3"
+                      },
+    "sdk":  {
+                "version":  "8.0.421",
+                "marker":  "C:/Program Files/dotnet/sdk/8.0.421/.version",
+                "bytes":  87,
+                "sha256":  "5A60F64119AF8F7551FD1A2D3FA45C4224B2227D254BD89D1B29EC2C3B62EF41"
+            },
+    "referencePacks":  [
+                           {
+                               "name":  "Microsoft.NETCore.App.Ref",
+                               "version":  "8.0.27",
+                               "marker":  "C:/Program Files/dotnet/packs/Microsoft.NETCore.App.Ref/8.0.27/data/FrameworkList.xml",
+                               "bytes":  35006,
+                               "sha256":  "0AFBDAD2630F9F732BC8C6FC91C4CDEB07197E886534B5AB1F3DD5A351F3DD38"
+                           },
+                           {
+                               "name":  "Microsoft.WindowsDesktop.App.Ref",
+                               "version":  "8.0.27",
+                               "marker":  "C:/Program Files/dotnet/packs/Microsoft.WindowsDesktop.App.Ref/8.0.27/data/FrameworkList.xml",
+                               "bytes":  11221,
+                               "sha256":  "01E2B382D4646E96079B3A7E820B1215ECA90CC141F6E767BCE1ECBF5E271E2C"
+                           }
+                       ],
+    "projects":  [
+                     {
+                         "assets":  "installer/wix/obj/project.assets.json",
+                         "assetsBytes":  3465,
+                         "assetsSha256":  "EA2AA5DE6E954728235EAA42C373D0B6390FABB9961917E24C8D54207477123E",
+                         "dgspec":  "installer/wix/obj/SwSearch.Package.wixproj.nuget.dgspec.json",
+                         "dgspecBytes":  2085,
+                         "dgspecSha256":  "40B85F0F67D11CE8E5BE70505500F0D02392311A2557114963616DB3A17ADC37",
+                         "props":  "installer/wix/obj/SwSearch.Package.wixproj.nuget.g.props",
+                         "propsBytes":  1221,
+                         "propsSha256":  "DE761F7E1E7C499130B9E777C2C90FB43D0558D467C09E9972FBCA9A6659B4A6",
+                         "targets":  "installer/wix/obj/SwSearch.Package.wixproj.nuget.g.targets",
+                         "targetsBytes":  685,
+                         "targetsSha256":  "30C479505621F85508ABFDE0957EE34A48464787D2AD6BFB8F8F2FA8B3E4BA24",
+                         "cache":  "installer/wix/obj/project.nuget.cache",
+                         "cacheBytes":  525,
+                         "cacheSha256":  "0E7837A0686006FD59046A8B3164C375175B611594475C92C59C1B99031FAA98"
+                     },
+                     {
+                         "assets":  "src/SwSearch.App/obj/project.assets.json",
+                         "assetsBytes":  30449,
+                         "assetsSha256":  "8C1743748AB216A4C37BF14BD295CEE65B2C34BC378001A78188DAA1F961CF8A",
+                         "dgspec":  "src/SwSearch.App/obj/SwSearch.App.csproj.nuget.dgspec.json",
+                         "dgspecBytes":  20136,
+                         "dgspecSha256":  "94BB566C1C93F57B889E100819434C784D9E3BF6824221D611123A6AAA8F2610",
+                         "props":  "src/SwSearch.App/obj/SwSearch.App.csproj.nuget.g.props",
+                         "propsBytes":  1524,
+                         "propsSha256":  "A51274AC306615F70C6238AE6FE608531597563439FF9C56499A6E24E36179B2",
+                         "targets":  "src/SwSearch.App/obj/SwSearch.App.csproj.nuget.g.targets",
+                         "targetsBytes":  777,
+                         "targetsSha256":  "2317B729D9C8133A3349DC107C5C91FCD3F692BC84701175F86000645AE2A124",
+                         "cache":  "src/SwSearch.App/obj/project.nuget.cache",
+                         "cacheBytes":  2008,
+                         "cacheSha256":  "F2612F5B0255C7A5F773FB5CCC59B8DFD947F03FEF9A52FCBD91221F2EA340A1"
+                     },
+                     {
+                         "assets":  "src/SwSearch.Broker/obj/project.assets.json",
+                         "assetsBytes":  24814,
+                         "assetsSha256":  "EC3CB41E11C6794C2CACBF91464E54DE2E30CC1D3E344F671E48464423082500",
+                         "dgspec":  "src/SwSearch.Broker/obj/SwSearch.Broker.csproj.nuget.dgspec.json",
+                         "dgspecBytes":  20479,
+                         "dgspecSha256":  "DA0E697DBFE269FAC105DADB8E982BA0A16AA3404C56D079E48D273C759B79D4",
+                         "props":  "src/SwSearch.Broker/obj/SwSearch.Broker.csproj.nuget.g.props",
+                         "propsBytes":  1221,
+                         "propsSha256":  "DE761F7E1E7C499130B9E777C2C90FB43D0558D467C09E9972FBCA9A6659B4A6",
+                         "targets":  "src/SwSearch.Broker/obj/SwSearch.Broker.csproj.nuget.g.targets",
+                         "targetsBytes":  525,
+                         "targetsSha256":  "DCE1F5AFE25ACC582955CFCA205BAF1FA5E76BEBB11F17A09B8E9D2029E83187",
+                         "cache":  "src/SwSearch.Broker/obj/project.nuget.cache",
+                         "cacheBytes":  1855,
+                         "cacheSha256":  "CEE7A1F780449D5CE600D9141A4BD67568F252F5D7FFDE577847D76BC252286F"
+                     },
+                     {
+                         "assets":  "src/SwSearch.Contracts/obj/project.assets.json",
+                         "assetsBytes":  2845,
+                         "assetsSha256":  "5E9F775B1EF1C9CD40CF6BCEA1AC7CE134B8C8A9B0D5A2FDBBF95A0E53EDC107",
+                         "dgspec":  "src/SwSearch.Contracts/obj/SwSearch.Contracts.csproj.nuget.dgspec.json",
+                         "dgspecBytes":  2993,
+                         "dgspecSha256":  "AF03272EF90A189669F0C4B83EBEDEDBBB0B6901269725EA600F79A26985307C",
+                         "props":  "src/SwSearch.Contracts/obj/SwSearch.Contracts.csproj.nuget.g.props",
+                         "propsBytes":  1221,
+                         "propsSha256":  "DE761F7E1E7C499130B9E777C2C90FB43D0558D467C09E9972FBCA9A6659B4A6",
+                         "targets":  "src/SwSearch.Contracts/obj/SwSearch.Contracts.csproj.nuget.g.targets",
+                         "targetsBytes":  150,
+                         "targetsSha256":  "971CC9B535384849B5C661D776CD7A80833A416265E32E8968E06C367368B8B5",
+                         "cache":  "src/SwSearch.Contracts/obj/project.nuget.cache",
+                         "cacheBytes":  802,
+                         "cacheSha256":  "EC83041E33AC9622B4D090B07BBB094BEAC8A38714C9328F08BBA0BE69F1D2AE"
+                     },
+                     {
+                         "assets":  "src/SwSearch.Everything/obj/project.assets.json",
+                         "assetsBytes":  4081,
+                         "assetsSha256":  "D87D548B415F2A258D0E2DF63025F4C07D32955FD30641E30F8D575803079751",
+                         "dgspec":  "src/SwSearch.Everything/obj/SwSearch.Everything.csproj.nuget.dgspec.json",
+                         "dgspecBytes":  6151,
+                         "dgspecSha256":  "654E709A67E88633791FFA4DD8A24BFC02624E9A515CEEB5D4292F31B1A11282",
+                         "props":  "src/SwSearch.Everything/obj/SwSearch.Everything.csproj.nuget.g.props",
+                         "propsBytes":  1221,
+                         "propsSha256":  "DE761F7E1E7C499130B9E777C2C90FB43D0558D467C09E9972FBCA9A6659B4A6",
+                         "targets":  "src/SwSearch.Everything/obj/SwSearch.Everything.csproj.nuget.g.targets",
+                         "targetsBytes":  150,
+                         "targetsSha256":  "971CC9B535384849B5C661D776CD7A80833A416265E32E8968E06C367368B8B5",
+                         "cache":  "src/SwSearch.Everything/obj/project.nuget.cache",
+                         "cacheBytes":  804,
+                         "cacheSha256":  "51E020E4CBBD66B6A6EA12F4DA1EE41B78FD25FF59A8D993AA7D51C3F87FFE18"
+                     },
+                     {
+                         "assets":  "src/SwSearch.Indexer/obj/project.assets.json",
+                         "assetsBytes":  20920,
+                         "assetsSha256":  "E87C1D614D77B30AE7358587387CFCA1E597A37F91960ED13C2539471086C9F1",
+                         "dgspec":  "src/SwSearch.Indexer/obj/SwSearch.Indexer.csproj.nuget.dgspec.json",
+                         "dgspecBytes":  9861,
+                         "dgspecSha256":  "035156A9A7CBD033D961B51ACAF2C5408BF5AB6E09DB1320F111ECC7F9332CC4",
+                         "props":  "src/SwSearch.Indexer/obj/SwSearch.Indexer.csproj.nuget.g.props",
+                         "propsBytes":  1221,
+                         "propsSha256":  "DE761F7E1E7C499130B9E777C2C90FB43D0558D467C09E9972FBCA9A6659B4A6",
+                         "targets":  "src/SwSearch.Indexer/obj/SwSearch.Indexer.csproj.nuget.g.targets",
+                         "targetsBytes":  525,
+                         "targetsSha256":  "DCE1F5AFE25ACC582955CFCA205BAF1FA5E76BEBB11F17A09B8E9D2029E83187",
+                         "cache":  "src/SwSearch.Indexer/obj/project.nuget.cache",
+                         "cacheBytes":  1857,
+                         "cacheSha256":  "E0F158D74AF94CA67CF89CB357AC7F9740DA8D8139733741CC1B85EBC9DBA85A"
+                     },
+                     {
+                         "assets":  "src/SwSearch.InstallerCoordinator/obj/project.assets.json",
+                         "assetsBytes":  5948,
+                         "assetsSha256":  "7E848EE1067DCCE27420285E050C93DF0795408AB0E1FA85A2FB968D11A8B51E",
+                         "dgspec":  "src/SwSearch.InstallerCoordinator/obj/SwSearch.InstallerCoordinator.csproj.nuget.dgspec.json",
+                         "dgspecBytes":  3406,
+                         "dgspecSha256":  "7C5185DED361D2779041BF6607388BADE0CAB64894F6A7D4A8C368ADE4225B8B",
+                         "props":  "src/SwSearch.InstallerCoordinator/obj/SwSearch.InstallerCoordinator.csproj.nuget.g.props",
+                         "propsBytes":  1862,
+                         "propsSha256":  "A8CCC70B1143C9F4858958944C2EBED429BA9E3F62E68F909A4D2FB623492720",
+                         "targets":  "src/SwSearch.InstallerCoordinator/obj/SwSearch.InstallerCoordinator.csproj.nuget.g.targets",
+                         "targetsBytes":  150,
+                         "targetsSha256":  "971CC9B535384849B5C661D776CD7A80833A416265E32E8968E06C367368B8B5",
+                         "cache":  "src/SwSearch.InstallerCoordinator/obj/project.nuget.cache",
+                         "cacheBytes":  981,
+                         "cacheSha256":  "C6483FC0EE8814DEA179809FCBBCF3E957EFBC8124EFAA01E85878E3C928028D"
+                     },
+                     {
+                         "assets":  "src/SwSearch.Integration/obj/project.assets.json",
+                         "assetsBytes":  21794,
+                         "assetsSha256":  "0C5949CDC6E2F4B06CCEF2F6708D0C835DA813031724C3E491D5CBBBFD4BEA82",
+                         "dgspec":  "src/SwSearch.Integration/obj/SwSearch.Integration.csproj.nuget.dgspec.json",
+                         "dgspecBytes":  13293,
+                         "dgspecSha256":  "6BC2282BFE901C0CB69B045D5CD7509F5FCC1CC647FA0103B8D79AB564BEF5D5",
+                         "props":  "src/SwSearch.Integration/obj/SwSearch.Integration.csproj.nuget.g.props",
+                         "propsBytes":  1221,
+                         "propsSha256":  "DE761F7E1E7C499130B9E777C2C90FB43D0558D467C09E9972FBCA9A6659B4A6",
+                         "targets":  "src/SwSearch.Integration/obj/SwSearch.Integration.csproj.nuget.g.targets",
+                         "targetsBytes":  525,
+                         "targetsSha256":  "DCE1F5AFE25ACC582955CFCA205BAF1FA5E76BEBB11F17A09B8E9D2029E83187",
+                         "cache":  "src/SwSearch.Integration/obj/project.nuget.cache",
+                         "cacheBytes":  1865,
+                         "cacheSha256":  "B90D54B5D6A8C08DF3214F6505338001DBA2903444F6F61E43DA3E14C5D4EC3D"
+                     },
+                     {
+                         "assets":  "src/SwSearch.Metadata.Worker/obj/project.assets.json",
+                         "assetsBytes":  4111,
+                         "assetsSha256":  "667201341E0EC07AD96F0DC0A15EEE10D3BD92E2ED920996CF7C52DAF98651F6",
+                         "dgspec":  "src/SwSearch.Metadata.Worker/obj/SwSearch.Metadata.Worker.csproj.nuget.dgspec.json",
+                         "dgspecBytes":  6201,
+                         "dgspecSha256":  "E2A252F88ED95C63F3A3C4B409927FB6379A4A715D7E719AFDED7603CD5A881A",
+                         "props":  "src/SwSearch.Metadata.Worker/obj/SwSearch.Metadata.Worker.csproj.nuget.g.props",
+                         "propsBytes":  1221,
+                         "propsSha256":  "DE761F7E1E7C499130B9E777C2C90FB43D0558D467C09E9972FBCA9A6659B4A6",
+                         "targets":  "src/SwSearch.Metadata.Worker/obj/SwSearch.Metadata.Worker.csproj.nuget.g.targets",
+                         "targetsBytes":  150,
+                         "targetsSha256":  "971CC9B535384849B5C661D776CD7A80833A416265E32E8968E06C367368B8B5",
+                         "cache":  "src/SwSearch.Metadata.Worker/obj/project.nuget.cache",
+                         "cacheBytes":  814,
+                         "cacheSha256":  "A129F1CF1B8995497D237720F586F608CE9B8866B27A4FABFE4D6678E0A284A4"
+                     },
+                     {
+                         "assets":  "src/SwSearch.PropertyConfig/obj/project.assets.json",
+                         "assetsBytes":  4105,
+                         "assetsSha256":  "0794D9E2AF2B40E559E907CEF403CB5C301C046710F54CFA8FD9012FCE092AE0",
+                         "dgspec":  "src/SwSearch.PropertyConfig/obj/SwSearch.PropertyConfig.csproj.nuget.dgspec.json",
+                         "dgspecBytes":  6191,
+                         "dgspecSha256":  "AFFD55A5DCBAA444FA8D533A03CE8C95EE634C3CBF433085D04ED0828FD1A079",
+                         "props":  "src/SwSearch.PropertyConfig/obj/SwSearch.PropertyConfig.csproj.nuget.g.props",
+                         "propsBytes":  1221,
+                         "propsSha256":  "DE761F7E1E7C499130B9E777C2C90FB43D0558D467C09E9972FBCA9A6659B4A6",
+                         "targets":  "src/SwSearch.PropertyConfig/obj/SwSearch.PropertyConfig.csproj.nuget.g.targets",
+                         "targetsBytes":  150,
+                         "targetsSha256":  "971CC9B535384849B5C661D776CD7A80833A416265E32E8968E06C367368B8B5",
+                         "cache":  "src/SwSearch.PropertyConfig/obj/project.nuget.cache",
+                         "cacheBytes":  812,
+                         "cacheSha256":  "A1FF08EB1083D333E92EBC079859034B5AD57925655D8AFDD97F880F48893BC2"
+                     },
+                     {
+                         "assets":  "src/SwSearch.PropertyViewer/obj/project.assets.json",
+                         "assetsBytes":  21912,
+                         "assetsSha256":  "F5592F0D0CE80CEF6C70C9A94DBEFA9D00116FE23F3E9189F317FEF732222576",
+                         "dgspec":  "src/SwSearch.PropertyViewer/obj/SwSearch.PropertyViewer.csproj.nuget.dgspec.json",
+                         "dgspecBytes":  13429,
+                         "dgspecSha256":  "9FB60E2A77A400F62F120695ADF6525165141219DF52AB618F5ECA2E4B23E687",
+                         "props":  "src/SwSearch.PropertyViewer/obj/SwSearch.PropertyViewer.csproj.nuget.g.props",
+                         "propsBytes":  1221,
+                         "propsSha256":  "DE761F7E1E7C499130B9E777C2C90FB43D0558D467C09E9972FBCA9A6659B4A6",
+                         "targets":  "src/SwSearch.PropertyViewer/obj/SwSearch.PropertyViewer.csproj.nuget.g.targets",
+                         "targetsBytes":  525,
+                         "targetsSha256":  "DCE1F5AFE25ACC582955CFCA205BAF1FA5E76BEBB11F17A09B8E9D2029E83187",
+                         "cache":  "src/SwSearch.PropertyViewer/obj/project.nuget.cache",
+                         "cacheBytes":  1871,
+                         "cacheSha256":  "818741D1F2E0868164E9D2C421E17051A70B75606392A5D2F742DC9A12F8707F"
+                     },
+                     {
+                         "assets":  "src/SwSearch.ShellRegistration/obj/project.assets.json",
+                         "assetsBytes":  2972,
+                         "assetsSha256":  "C192164D29BC4F25826BA75A43A26B1065ABF07DD3CF86FA44E279E395AECC1C",
+                         "dgspec":  "src/SwSearch.ShellRegistration/obj/SwSearch.ShellRegistration.csproj.nuget.dgspec.json",
+                         "dgspecBytes":  3119,
+                         "dgspecSha256":  "23525B9D94DB737A69BDE2176CE71C5ACC4DCE8611526C8C32946692CF6CFF5E",
+                         "props":  "src/SwSearch.ShellRegistration/obj/SwSearch.ShellRegistration.csproj.nuget.g.props",
+                         "propsBytes":  1221,
+                         "propsSha256":  "DE761F7E1E7C499130B9E777C2C90FB43D0558D467C09E9972FBCA9A6659B4A6",
+                         "targets":  "src/SwSearch.ShellRegistration/obj/SwSearch.ShellRegistration.csproj.nuget.g.targets",
+                         "targetsBytes":  150,
+                         "targetsSha256":  "971CC9B535384849B5C661D776CD7A80833A416265E32E8968E06C367368B8B5",
+                         "cache":  "src/SwSearch.ShellRegistration/obj/project.nuget.cache",
+                         "cacheBytes":  818,
+                         "cacheSha256":  "86ACA83995E8E029BF33FBA2E275E796CF475294D01A127F22EA4583478F3ACC"
+                     },
+                     {
+                         "assets":  "src/SwSearch.WebUi/obj/project.assets.json",
+                         "assetsBytes":  9302,
+                         "assetsSha256":  "5FF1F463C710CC0946CF756CEB01E858E65FA838CAF44BDCE1F4B14FD62D7B40",
+                         "dgspec":  "src/SwSearch.WebUi/obj/SwSearch.WebUi.csproj.nuget.dgspec.json",
+                         "dgspecBytes":  3293,
+                         "dgspecSha256":  "70712E2EE6EF312918FAF89696540FE350CB4E033A6FEFE0F315D18B44AC845A",
+                         "props":  "src/SwSearch.WebUi/obj/SwSearch.WebUi.csproj.nuget.g.props",
+                         "propsBytes":  1524,
+                         "propsSha256":  "A51274AC306615F70C6238AE6FE608531597563439FF9C56499A6E24E36179B2",
+                         "targets":  "src/SwSearch.WebUi/obj/SwSearch.WebUi.csproj.nuget.g.targets",
+                         "targetsBytes":  505,
+                         "targetsSha256":  "3E202B5D139B9A9FF7871E98E1BD7316FD9A33D362DC60AEE0E7AFE84EE753AF",
+                         "cache":  "src/SwSearch.WebUi/obj/project.nuget.cache",
+                         "cacheBytes":  953,
+                         "cacheSha256":  "4B15533A80ECAF9B3FDDC350169BADE709DDC58481003102438578FFEB39A36C"
+                     },
+                     {
+                         "assets":  "tests/SwSearch.App.Tests/obj/project.assets.json",
+                         "assetsBytes":  160175,
+                         "assetsSha256":  "9A183B57D9A08AEC65E36498CB18F531F6733C1D35D960F3C1818114C63D940A",
+                         "dgspec":  "tests/SwSearch.App.Tests/obj/SwSearch.App.Tests.csproj.nuget.dgspec.json",
+                         "dgspecBytes":  23965,
+                         "dgspecSha256":  "8C32AF75CCDEE9A79934FBDC41E94383A285A3F8E9511DD54266321D2682D84F",
+                         "props":  "tests/SwSearch.App.Tests/obj/SwSearch.App.Tests.csproj.nuget.g.props",
+                         "propsBytes":  3491,
+                         "propsSha256":  "2A26066FB1EFB448996F29FFAA8FB8697F74E4049B6795AE981B9E3E91AA4CED",
+                         "targets":  "tests/SwSearch.App.Tests/obj/SwSearch.App.Tests.csproj.nuget.g.targets",
+                         "targetsBytes":  2029,
+                         "targetsSha256":  "5E947399E2739F6D68744335915D97377C6DB617030B5A401233AF9E6437072A",
+                         "cache":  "tests/SwSearch.App.Tests/obj/project.nuget.cache",
+                         "cacheBytes":  4471,
+                         "cacheSha256":  "BDFE1CDBB602107F5785D06232E101D77D9F4061C1D484AF831298E37F9A4FB8"
+                     },
+                     {
+                         "assets":  "tests/SwSearch.CandidateIlGate/obj/project.assets.json",
+                         "assetsBytes":  3066,
+                         "assetsSha256":  "98E4E9490FCB347DC8B2C065D799B331A46A0D55098742985E48F691969245A9",
+                         "dgspec":  "tests/SwSearch.CandidateIlGate/obj/SwSearch.CandidateIlGate.csproj.nuget.dgspec.json",
+                         "dgspecBytes":  3215,
+                         "dgspecSha256":  "28B1D57281016D735DA5F4174046B550086CC352531BDD69ADD1A41242CC7192",
+                         "props":  "tests/SwSearch.CandidateIlGate/obj/SwSearch.CandidateIlGate.csproj.nuget.g.props",
+                         "propsBytes":  1221,
+                         "propsSha256":  "DE761F7E1E7C499130B9E777C2C90FB43D0558D467C09E9972FBCA9A6659B4A6",
+                         "targets":  "tests/SwSearch.CandidateIlGate/obj/SwSearch.CandidateIlGate.csproj.nuget.g.targets",
+                         "targetsBytes":  150,
+                         "targetsSha256":  "971CC9B535384849B5C661D776CD7A80833A416265E32E8968E06C367368B8B5",
+                         "cache":  "tests/SwSearch.CandidateIlGate/obj/project.nuget.cache",
+                         "cacheBytes":  816,
+                         "cacheSha256":  "A9C2A64437AF59AA3EC55E5C454B3589408B56DF98246BE918E1B66201B5C9C5"
+                     },
+                     {
+                         "assets":  "tests/SwSearch.Everything.Tests/obj/project.assets.json",
+                         "assetsBytes":  64535,
+                         "assetsSha256":  "300610849ADF25A1EFC4B9F1EFDB22402A1F45AE2197F29AE32382D1BA086C9B",
+                         "dgspec":  "tests/SwSearch.Everything.Tests/obj/SwSearch.Everything.Tests.csproj.nuget.dgspec.json",
+                         "dgspecBytes":  10206,
+                         "dgspecSha256":  "97779FEBFD411D414E71BDAB55922E118A266E66DE85BB4C5C7AA6AEA5EB3F61",
+                         "props":  "tests/SwSearch.Everything.Tests/obj/SwSearch.Everything.Tests.csproj.nuget.g.props",
+                         "propsBytes":  2776,
+                         "propsSha256":  "56B32B3AD7CEB1AFD2DB69B19E177B4D37B9349C700154D220147BB782F8E49C",
+                         "targets":  "tests/SwSearch.Everything.Tests/obj/SwSearch.Everything.Tests.csproj.nuget.g.targets",
+                         "targetsBytes":  931,
+                         "targetsSha256":  "B15CBC82D98862BFA153B4098BBABA235FA7423888145F6C61AB0CBC87D338AF",
+                         "cache":  "tests/SwSearch.Everything.Tests/obj/project.nuget.cache",
+                         "cacheBytes":  2856,
+                         "cacheSha256":  "B16283D41B6741EB3D8232405A60D15B7A4A42D89D445079D75D7EDB71C01719"
+                     },
+                     {
+                         "assets":  "tests/SwSearch.Indexer.Tests/obj/project.assets.json",
+                         "assetsBytes":  81409,
+                         "assetsSha256":  "D5D2D399AD92F4122900C01857A3127A57E7C65A7DF9CB8832A8321D26FF013B",
+                         "dgspec":  "tests/SwSearch.Indexer.Tests/obj/SwSearch.Indexer.Tests.csproj.nuget.dgspec.json",
+                         "dgspecBytes":  14283,
+                         "dgspecSha256":  "03AE00F5B6A35E4A6928F50E7CF467E75A754ADD180724279C33FA3D3138D07F",
+                         "props":  "tests/SwSearch.Indexer.Tests/obj/SwSearch.Indexer.Tests.csproj.nuget.g.props",
+                         "propsBytes":  2776,
+                         "propsSha256":  "56B32B3AD7CEB1AFD2DB69B19E177B4D37B9349C700154D220147BB782F8E49C",
+                         "targets":  "tests/SwSearch.Indexer.Tests/obj/SwSearch.Indexer.Tests.csproj.nuget.g.targets",
+                         "targetsBytes":  1203,
+                         "targetsSha256":  "50C3E694383663FC8D9C4124FC094988FB8936B40E5553951BBF874268DA0BB6",
+                         "cache":  "tests/SwSearch.Indexer.Tests/obj/project.nuget.cache",
+                         "cacheBytes":  3909,
+                         "cacheSha256":  "516BB85F58C9C816C55A2570E3D2DD82F0F8622A0D3E8774BA862B4AFCE06226"
+                     },
+                     {
+                         "assets":  "tests/SwSearch.InstallerCoordinator.NativeHelper/obj/project.assets.json",
+                         "assetsBytes":  3047,
+                         "assetsSha256":  "64FF2FC71ED2195068A65EBB1A122359662807F43274C54076A4980E562B4805",
+                         "dgspec":  "tests/SwSearch.InstallerCoordinator.NativeHelper/obj/SwSearch.InstallerCoordinator.NativeHelper.csproj.nuget.dgspec.json",
+                         "dgspecBytes":  3262,
+                         "dgspecSha256":  "594F606A85CEA9CE30D30E796A05338C81039D5264CC221A89915B6F612174C6",
+                         "props":  "tests/SwSearch.InstallerCoordinator.NativeHelper/obj/SwSearch.InstallerCoordinator.NativeHelper.csproj.nuget.g.props",
+                         "propsBytes":  1221,
+                         "propsSha256":  "DE761F7E1E7C499130B9E777C2C90FB43D0558D467C09E9972FBCA9A6659B4A6",
+                         "targets":  "tests/SwSearch.InstallerCoordinator.NativeHelper/obj/SwSearch.InstallerCoordinator.NativeHelper.csproj.nuget.g.targets",
+                         "targetsBytes":  150,
+                         "targetsSha256":  "971CC9B535384849B5C661D776CD7A80833A416265E32E8968E06C367368B8B5",
+                         "cache":  "tests/SwSearch.InstallerCoordinator.NativeHelper/obj/project.nuget.cache",
+                         "cacheBytes":  852,
+                         "cacheSha256":  "256217FF4DB5B17F4C0FDCD27E001F7202B6C4CDCC35D1A59D1942DE1E05A2F5"
+                     },
+                     {
+                         "assets":  "tests/SwSearch.InstallerCoordinator.Tests/obj/project.assets.json",
+                         "assetsBytes":  63457,
+                         "assetsSha256":  "995F9A35CE058FF41840A96833BF4971992FDA105FE200880C23A78742F629D6",
+                         "dgspec":  "tests/SwSearch.InstallerCoordinator.Tests/obj/SwSearch.InstallerCoordinator.Tests.csproj.nuget.dgspec.json",
+                         "dgspecBytes":  7313,
+                         "dgspecSha256":  "F3165A1D9B024D442EB5461A5FBB206D93197E78CAC93FCA30B8955C4002DE82",
+                         "props":  "tests/SwSearch.InstallerCoordinator.Tests/obj/SwSearch.InstallerCoordinator.Tests.csproj.nuget.g.props",
+                         "propsBytes":  2776,
+                         "propsSha256":  "56B32B3AD7CEB1AFD2DB69B19E177B4D37B9349C700154D220147BB782F8E49C",
+                         "targets":  "tests/SwSearch.InstallerCoordinator.Tests/obj/SwSearch.InstallerCoordinator.Tests.csproj.nuget.g.targets",
+                         "targetsBytes":  931,
+                         "targetsSha256":  "B15CBC82D98862BFA153B4098BBABA235FA7423888145F6C61AB0CBC87D338AF",
+                         "cache":  "tests/SwSearch.InstallerCoordinator.Tests/obj/project.nuget.cache",
+                         "cacheBytes":  2876,
+                         "cacheSha256":  "2DBE820BC8AA690753AF54831F3F20913759FCB2C37EBA55EA12D8E606F2E1C4"
+                     },
+                     {
+                         "assets":  "tests/SwSearch.InstallerCoordinator.WatchdogHelper/obj/project.assets.json",
+                         "assetsBytes":  4427,
+                         "assetsSha256":  "2FC90F25D18A4EE0D68AF2543CB102178CF2F38C4662D6D9A96B7CC0A96B06CF",
+                         "dgspec":  "tests/SwSearch.InstallerCoordinator.WatchdogHelper/obj/SwSearch.InstallerCoordinator.WatchdogHelper.csproj.nuget.dgspec.json",
+                         "dgspecBytes":  6846,
+                         "dgspecSha256":  "0CB0AD00E41138A46186FBDA09A4D9B740DB25594F6F6EEDC7D901EA246FAD45",
+                         "props":  "tests/SwSearch.InstallerCoordinator.WatchdogHelper/obj/SwSearch.InstallerCoordinator.WatchdogHelper.csproj.nuget.g.props",
+                         "propsBytes":  1221,
+                         "propsSha256":  "DE761F7E1E7C499130B9E777C2C90FB43D0558D467C09E9972FBCA9A6659B4A6",
+                         "targets":  "tests/SwSearch.InstallerCoordinator.WatchdogHelper/obj/SwSearch.InstallerCoordinator.WatchdogHelper.csproj.nuget.g.targets",
+                         "targetsBytes":  150,
+                         "targetsSha256":  "971CC9B535384849B5C661D776CD7A80833A416265E32E8968E06C367368B8B5",
+                         "cache":  "tests/SwSearch.InstallerCoordinator.WatchdogHelper/obj/project.nuget.cache",
+                         "cacheBytes":  856,
+                         "cacheSha256":  "20C4135F755519E59CFD38A56B2D6C5F1C289E03A98215B5E70E560BDD8C3E15"
+                     },
+                     {
+                         "assets":  "tests/SwSearch.Integration.Tests/obj/project.assets.json",
+                         "assetsBytes":  97790,
+                         "assetsSha256":  "79FD6DDAD24BB5AC1E988D3484994BE2EC34E1C02A25358BC119EF7A7BDC025D",
+                         "dgspec":  "tests/SwSearch.Integration.Tests/obj/SwSearch.Integration.Tests.csproj.nuget.dgspec.json",
+                         "dgspecBytes":  42672,
+                         "dgspecSha256":  "18FC543E28CE01BBEF772A1A99690C941F55A1454804849E7E3798D7C8204F50",
+                         "props":  "tests/SwSearch.Integration.Tests/obj/SwSearch.Integration.Tests.csproj.nuget.g.props",
+                         "propsBytes":  2982,
+                         "propsSha256":  "DA306A5A768E77781486914CEB545ED4A0DE589BC120807F3198C29AB0EF3502",
+                         "targets":  "tests/SwSearch.Integration.Tests/obj/SwSearch.Integration.Tests.csproj.nuget.g.targets",
+                         "targetsBytes":  1455,
+                         "targetsSha256":  "AF568E6E0578B0DDBC213FE0E91FF13496000A8EC4A3277F5891EACAAA14703D",
+                         "cache":  "tests/SwSearch.Integration.Tests/obj/project.nuget.cache",
+                         "cacheBytes":  4076,
+                         "cacheSha256":  "E0595DFF157028E9F4D99EEA1AEC8F51877C92248E0A3E1D6B23FE2A3628A04D"
+                     },
+                     {
+                         "assets":  "tests/SwSearch.Metadata.Worker.Tests/obj/project.assets.json",
+                         "assetsBytes":  82079,
+                         "assetsSha256":  "262977683CA8E3571111FF0DA78E1D808A5FC43C95259B6EC5E93BA9C0F06DEF",
+                         "dgspec":  "tests/SwSearch.Metadata.Worker.Tests/obj/SwSearch.Metadata.Worker.Tests.csproj.nuget.dgspec.json",
+                         "dgspecBytes":  17180,
+                         "dgspecSha256":  "81ED1309ED6C18EB23B8E46ACF2EB841EB934AEB23413D54F50E29CAA0A1F789",
+                         "props":  "tests/SwSearch.Metadata.Worker.Tests/obj/SwSearch.Metadata.Worker.Tests.csproj.nuget.g.props",
+                         "propsBytes":  2776,
+                         "propsSha256":  "D91108D095D22D94118E593DF0CB78B67B9E1E805B295ACA231FBDBFFBCB784E",
+                         "targets":  "tests/SwSearch.Metadata.Worker.Tests/obj/SwSearch.Metadata.Worker.Tests.csproj.nuget.g.targets",
+                         "targetsBytes":  1203,
+                         "targetsSha256":  "B5E9220A2421E46F710D2D10532F7805F0ADB0C78C202C0E955C360F3F06DC15",
+                         "cache":  "tests/SwSearch.Metadata.Worker.Tests/obj/project.nuget.cache",
+                         "cacheBytes":  3925,
+                         "cacheSha256":  "F9763C44324D254EFFA1F697B3640415CADA2F0036AE0CEB54D189A5E5443C47"
+                     },
+                     {
+                         "assets":  "tests/SwSearch.PropertyConfig.Tests/obj/project.assets.json",
+                         "assetsBytes":  64322,
+                         "assetsSha256":  "576C264459E4EF1C77280D6A01D3577B270AD0FAA55F7BCA591B8CA222BC735C",
+                         "dgspec":  "tests/SwSearch.PropertyConfig.Tests/obj/SwSearch.PropertyConfig.Tests.csproj.nuget.dgspec.json",
+                         "dgspecBytes":  10026,
+                         "dgspecSha256":  "B894588754E3238534FCA4FC874A9AEC34D890776B43A41CEBC85A8528114747",
+                         "props":  "tests/SwSearch.PropertyConfig.Tests/obj/SwSearch.PropertyConfig.Tests.csproj.nuget.g.props",
+                         "propsBytes":  2776,
+                         "propsSha256":  "56B32B3AD7CEB1AFD2DB69B19E177B4D37B9349C700154D220147BB782F8E49C",
+                         "targets":  "tests/SwSearch.PropertyConfig.Tests/obj/SwSearch.PropertyConfig.Tests.csproj.nuget.g.targets",
+                         "targetsBytes":  931,
+                         "targetsSha256":  "B15CBC82D98862BFA153B4098BBABA235FA7423888145F6C61AB0CBC87D338AF",
+                         "cache":  "tests/SwSearch.PropertyConfig.Tests/obj/project.nuget.cache",
+                         "cacheBytes":  2864,
+                         "cacheSha256":  "11337EA4A4356026A51D53E4715B49CE951E6D1DC248A9D00F3B2E4C798EBF16"
+                     },
+                     {
+                         "assets":  "tests/SwSearch.PropertyViewer.Tests/obj/project.assets.json",
+                         "assetsBytes":  151724,
+                         "assetsSha256":  "1EA0654338CCBB2181FF1D3F5C98EA2BD6D359C58A1AC70ADA79C7445C4168AD",
+                         "dgspec":  "tests/SwSearch.PropertyViewer.Tests/obj/SwSearch.PropertyViewer.Tests.csproj.nuget.dgspec.json",
+                         "dgspecBytes":  17138,
+                         "dgspecSha256":  "93367BF08089ADD803A869A812A90FE27D69C829E785F00ECE93E0B4B99BE055",
+                         "props":  "tests/SwSearch.PropertyViewer.Tests/obj/SwSearch.PropertyViewer.Tests.csproj.nuget.g.props",
+                         "propsBytes":  3188,
+                         "propsSha256":  "036516217BBE99A543831AB0BFDA470CA89DEAEB515DC32FD810BB98542FFEFC",
+                         "targets":  "tests/SwSearch.PropertyViewer.Tests/obj/SwSearch.PropertyViewer.Tests.csproj.nuget.g.targets",
+                         "targetsBytes":  1777,
+                         "targetsSha256":  "E2FD1DA310393DF7BC33A65D7B8F6AFB62F5715A08FA5BD59BADD27C6BDC7411",
+                         "cache":  "tests/SwSearch.PropertyViewer.Tests/obj/project.nuget.cache",
+                         "cacheBytes":  4334,
+                         "cacheSha256":  "10B2EBA06768D1AEEBB4B96937199879A55B23E0FB3CBFC4139FD09029F0457E"
+                     },
+                     {
+                         "assets":  "tests/SwSearch.ShellRegistration.Tests/obj/project.assets.json",
+                         "assetsBytes":  133083,
+                         "assetsSha256":  "77906D3D20516CCCE50C21C81B23937CE09E0976484A4D75D413576AD0CC7493",
+                         "dgspec":  "tests/SwSearch.ShellRegistration.Tests/obj/SwSearch.ShellRegistration.Tests.csproj.nuget.dgspec.json",
+                         "dgspecBytes":  6864,
+                         "dgspecSha256":  "2265376F99D4DE4761D1B7FE2DD586FC1FCFD7920614BF322948B5FD5FDD11D6",
+                         "props":  "tests/SwSearch.ShellRegistration.Tests/obj/SwSearch.ShellRegistration.Tests.csproj.nuget.g.props",
+                         "propsBytes":  3188,
+                         "propsSha256":  "036516217BBE99A543831AB0BFDA470CA89DEAEB515DC32FD810BB98542FFEFC",
+                         "targets":  "tests/SwSearch.ShellRegistration.Tests/obj/SwSearch.ShellRegistration.Tests.csproj.nuget.g.targets",
+                         "targetsBytes":  1505,
+                         "targetsSha256":  "B4DE1C9BE9739C2F91EEA38A7B75DA3C406CE0B2C8DB7169F4FFDC5A537E8423",
+                         "cache":  "tests/SwSearch.ShellRegistration.Tests/obj/project.nuget.cache",
+                         "cacheBytes":  3281,
+                         "cacheSha256":  "84C37B0F530969CB97387D83E2846A55EB08235EF9BF25DE07B219874A33F22A"
+                     }
+                 ]
+}

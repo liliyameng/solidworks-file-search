@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+         xmlns:com="http://schemas.microsoft.com/appx/manifest/com/windows10"
+         xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+         xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+         xmlns:desktop4="http://schemas.microsoft.com/appx/manifest/desktop/windows10/4"
+         xmlns:desktop5="http://schemas.microsoft.com/appx/manifest/desktop/windows10/5"
+         IgnorableNamespaces="com uap rescap desktop4 desktop5">
+  <Identity Name="SwSearch.ModernContextMenu" Publisher="@@PUBLISHER@@" Version="@@VERSION@@" ProcessorArchitecture="x64" />
+  <Properties>
+    <DisplayName>SOLIDWORKS 文件检索现代右键菜单</DisplayName>
+    <PublisherDisplayName>SwSearch</PublisherDisplayName>
+    <Logo>SwSearch-256.png</Logo>
+  </Properties>
+  <Dependencies><TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.22000.0" MaxVersionTested="10.0.26100.0" /></Dependencies>
+  <Applications>
+    <Application Id="ContextMenu" Executable="SwSearch.ModernContextMenuRegistration.exe" EntryPoint="Windows.FullTrustApplication">
+      <uap:VisualElements AppListEntry="none"
+                          DisplayName="SOLIDWORKS File Search"
+                          Description="SOLIDWORKS folder search command"
+                          BackgroundColor="transparent"
+                          Square44x44Logo="SwSearch-256.png"
+                          Square150x150Logo="SwSearch-256.png" />
+      <Extensions>
+        <com:Extension Category="windows.comServer">
+          <com:ComServer>
+            <com:SurrogateServer DisplayName="SwSearch Explorer Command">
+              <com:Class Id="5C2E54CE-4EF3-4CD3-A4A1-6DE134AB7829" Path="SwSearch.ModernContextMenu.dll" ThreadingModel="STA" />
+              <com:Class Id="7A784FD1-89A1-4B68-97D0-545EE70D3A25" Path="SwSearch.ModernContextMenu.dll" ThreadingModel="STA" />
+            </com:SurrogateServer>
+          </com:ComServer>
+        </com:Extension>
+        <desktop4:Extension Category="windows.fileExplorerContextMenus">
+          <desktop4:FileExplorerContextMenus>
+            <desktop5:ItemType Type="Directory"><desktop5:Verb Id="SwSearchSearchHere" Clsid="5C2E54CE-4EF3-4CD3-A4A1-6DE134AB7829" /></desktop5:ItemType>
+            <desktop5:ItemType Type="Directory\Background"><desktop5:Verb Id="SwSearchSearchHereBackground" Clsid="5C2E54CE-4EF3-4CD3-A4A1-6DE134AB7829" /></desktop5:ItemType>
+            <desktop5:ItemType Type=".sldprt"><desktop5:Verb Id="SwSearchViewPartProperties" Clsid="7A784FD1-89A1-4B68-97D0-545EE70D3A25" /></desktop5:ItemType>
+            <desktop5:ItemType Type=".sldasm"><desktop5:Verb Id="SwSearchViewAssemblyProperties" Clsid="7A784FD1-89A1-4B68-97D0-545EE70D3A25" /></desktop5:ItemType>
+          </desktop4:FileExplorerContextMenus>
+        </desktop4:Extension>
+      </Extensions>
+    </Application>
+  </Applications>
+  <Capabilities>
+    <rescap:Capability Name="runFullTrust" />
+  </Capabilities>
+</Package>

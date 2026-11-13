@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationIcon>..\Assets\Brand\SwSearch.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SwSearch.Contracts\SwSearch.Contracts.csproj" />
+    <ProjectReference Include="..\SwSearch.Integration\SwSearch.Integration.csproj" />
+    <ProjectReference Include="..\SwSearch.WebUi\SwSearch.WebUi.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Runtime-only fixed SQLite provider for Integration's read-only fallback. -->
+    <Reference Include="SQLitePCLRaw.core">
+      <HintPath>..\..\.packages-rc48-r3\sqlitepclraw.core\2.1.11\lib\netstandard2.0\SQLitePCLRaw.core.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.provider.e_sqlite3">
+      <HintPath>..\..\.packages-rc48-r3\sqlitepclraw.provider.e_sqlite3\2.1.11\lib\net6.0-windows7.0\SQLitePCLRaw.provider.e_sqlite3.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.batteries_v2">
+      <HintPath>..\..\.packages-rc48-r3\sqlitepclraw.bundle_e_sqlite3\2.1.11\lib\netstandard2.0\SQLitePCLRaw.batteries_v2.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Content Include="..\..\.packages-rc48-r3\sqlitepclraw.lib.e_sqlite3\2.1.11\runtimes\win-x64\native\e_sqlite3.dll"
+             Link="e_sqlite3.dll" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\Assets\Brand\SwSearch.ico" Link="Assets\Brand\SwSearch.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="SwSearch.App.Tests" />
+  </ItemGroup>
+  <ItemGroup>
+    <Using Remove="System.Drawing" />
+    <Using Remove="System.Windows.Forms" />
+  </ItemGroup>
+</Project>

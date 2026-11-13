@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>SwSearch.Broker</AssemblyName>
+    <RootNamespace>SwSearch.InstallerCoordinator.NativeHelper</RootNamespace>
+    <Company>SwSearch.Broker</Company>
+    <Product>SwSearch.Broker</Product>
+    <Description>SwSearch installer coordinator isolated native gate helper</Description>
+  </PropertyGroup>
+</Project>

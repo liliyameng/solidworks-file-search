@@ -1,0 +1,16 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
+  <!-- RETIRED 2026-07-14. For forensic reference only. Do not ship or rebuild. -->
+  <Bundle Name="SOLIDWORKS 文件检索"
+          Manufacturer="SwSearch"
+          Version="$(var.ProductVersion)"
+          UpgradeCode="2E17BF1C-7FBB-48A0-98A2-D917108C66AC"
+          Compressed="yes">
+    <BootstrapperApplication>
+      <bal:WixInternalUIBootstrapperApplication Theme="standard" />
+    </BootstrapperApplication>
+    <Chain>
+      <MsiPackage SourceFile="$(var.MsiPath)" bal:PrimaryPackageType="default" />
+    </Chain>
+  </Bundle>
+</Wix>

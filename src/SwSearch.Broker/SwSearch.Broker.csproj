@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <ApplicationIcon>..\Assets\Brand\SwSearch.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SwSearch.Contracts\SwSearch.Contracts.csproj" />
+    <ProjectReference Include="..\SwSearch.Everything\SwSearch.Everything.csproj" />
+    <ProjectReference Include="..\SwSearch.Indexer\SwSearch.Indexer.csproj" />
+    <ProjectReference Include="..\SwSearch.Metadata.Worker\SwSearch.Metadata.Worker.csproj" />
+    <ProjectReference Include="..\SwSearch.PropertyConfig\SwSearch.PropertyConfig.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="SwSearch.Integration.Tests" />
+  </ItemGroup>
+</Project>
