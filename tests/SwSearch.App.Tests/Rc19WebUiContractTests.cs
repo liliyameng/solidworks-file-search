@@ -16,7 +16,8 @@ public sealed class Rc19WebUiContractTests
         StringAssert.Contains(js, "post(\"restoreScope\", {})");
         Assert.IsFalse(js.Contains("选择目录", StringComparison.Ordinal));
         Assert.IsFalse(js.Contains("全部位置", StringComparison.Ordinal));
-        StringAssert.Contains(js, "placeholder=\"键入文件名或属性，立即搜索\"");
+        // RC93 i18n: placeholder text resolves through the shared lang tables.
+        StringAssert.Contains(js, "placeholder=\"${escapeText(t(\"search.placeholder\"))}\"");
         StringAssert.Contains(js, "id=\"rows\"");
     }
 
@@ -25,9 +26,9 @@ public sealed class Rc19WebUiContractTests
     {
         var js = Read("src", "SwSearch.WebUi", "Assets", "webui", "app.js");
 
-        StringAssert.Contains(js, "data-mode=\"all\" aria-pressed=\"true\">全部</button>");
-        StringAssert.Contains(js, "data-mode=\"name\" aria-pressed=\"false\">文件名</button>");
-        StringAssert.Contains(js, "data-mode=\"property\" aria-pressed=\"false\">属性</button>");
+        StringAssert.Contains(js, "data-mode=\"all\" aria-pressed=\"true\">${escapeText(t(\"mode.all\"))}</button>");
+        StringAssert.Contains(js, "data-mode=\"name\" aria-pressed=\"false\">${escapeText(t(\"mode.name\"))}</button>");
+        StringAssert.Contains(js, "data-mode=\"property\" aria-pressed=\"false\">${escapeText(t(\"mode.property\"))}</button>");
         StringAssert.Contains(js, "allowedModes.includes(state.mode) ? state.mode : \"all\"");
         StringAssert.Contains(js, "updateDesktopModeButtons(mode)");
         StringAssert.Contains(js, "search.addEventListener(\"input\"");

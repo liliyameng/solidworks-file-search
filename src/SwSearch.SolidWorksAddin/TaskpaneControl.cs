@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using SolidWorks.Interop.sldworks;
+using SwSearch.WebUi;
 
 namespace SwSearch.SolidWorksAddin
 {
@@ -72,7 +73,18 @@ namespace SwSearch.SolidWorksAddin
         private int _searchMode = 3;
         private int _scopeMode = TaskpaneSearchScope.AllMachine;
         private string _scopePath = String.Empty;
-        private string _status = "正在连接搜索服务…";
+        private string _status = "正在连接搜索服务…"; // replaced in the constructor via T("status.connecting")
+
+        // Effective UI language, resolved once per control construction from
+        // settings.json ("auto" follows the OS). A language change made in the
+        // desktop settings window reaches the task pane the next time this
+        // control is created (task pane reopen / SOLIDWORKS restart).
+        private readonly string _uiLanguage;
+
+        private string T(string key)
+        {
+            return TaskpaneUserText.T(_uiLanguage, key);
+        }
 
         internal TaskpaneControl(ISldWorks swApplication)
             : this(swApplication, null, null)
@@ -101,6 +113,8 @@ namespace SwSearch.SolidWorksAddin
             ITaskpaneShellResultsTarget shellResults)
         {
             _swApplication = swApplication;
+            _uiLanguage = UiLanguage.ResolveEffective(TaskpaneUserText.ReadConfiguredLanguage());
+            _status = T("status.connecting");
             _librarySettingsInjected = librarySettings != null;
             _librarySettings = librarySettings ?? TaskpaneLibrarySettings.Load(swApplication);
             _librarySettingsLoadedAtUtc = DateTime.UtcNow;
@@ -140,7 +154,11 @@ namespace SwSearch.SolidWorksAddin
             _searchCoordinator.Completed += SearchCompleted;
             _searchScheduler = new LiveSearchScheduler(SubmitScheduledSearch, 40);
 
-            _webHost = new TaskpaneCompositionWebViewHost { Dock = DockStyle.Fill };
+            _webHost = new TaskpaneCompositionWebViewHost
+            {
+                Dock = DockStyle.Fill,
+                EffectiveUiLanguage = _uiLanguage
+            };
             _webHost.WebReady += WebHostReady;
             _webHost.CommandReceived += WebCommandReceived;
             _webHost.HostFailure += WebHostFailure;
@@ -307,7 +325,7 @@ namespace SwSearch.SolidWorksAddin
 
         private void ShellResultsFailure(object sender, ShellResultsFailureEventArgs args)
         {
-            _status = "文件结果视图暂不可用";
+            _status = T("status.fileViewUnavailable");
             _statusLabel.Text = _status;
             RecordFailure(args.Stage, args.Exception);
             PublishState(null);
@@ -332,7 +350,7 @@ namespace SwSearch.SolidWorksAddin
                 if (command.Type == "retry")
                 {
                     BrokerProtocol.RetryConnection();
-                    _status = "正在重新连接后台更新…";
+                    _status = T("status.reconnectingBg");
                     PublishState(command.RequestId);
                     BeginNewResultSet();
                     ScheduleSearch(true, true);
@@ -342,7 +360,7 @@ namespace SwSearch.SolidWorksAddin
             {
                 RecordFailure("taskpane-bridge", exception);
                 _webHost.PostError(args.Command == null ? null : args.Command.RequestId,
-                    "操作未能完成，请重试。");
+                    T("status.retryAction"));
             }
         }
 
@@ -403,12 +421,12 @@ namespace SwSearch.SolidWorksAddin
                 out error))
             {
                 BeginNewResultSet();
-                _status = String.IsNullOrWhiteSpace(error) ? "未配置 SOLIDWORKS 设计库路径" : error;
+                _status = String.IsNullOrWhiteSpace(error) ? T("status.libraryNotConfigured") : error;
                 PublishState(null);
                 return;
             }
 
-            _status = "文件库 · 正在搜索…";
+            _status = T("status.librarySearching");
             PublishState(null);
             _searchCoordinator.Submit(request.WithPage(0, InitialPageSize, isInteractive));
         }
@@ -431,8 +449,8 @@ namespace SwSearch.SolidWorksAddin
                 _explicitAppExitMarked = false;
                 _connectionFailed = true;
                 _status = completion.Error is BrokerProtocolMismatchException
-                    ? "搜索服务版本不匹配：" + completion.Error.Message
-                    : "后台更新暂不可用";
+                    ? T("prefix.versionMismatch") + completion.Error.Message
+                    : T("status.bgUnavailable");
                 PublishState(null);
                 return;
             }
@@ -445,8 +463,8 @@ namespace SwSearch.SolidWorksAddin
             {
                 BeginNewResultSet();
                 _status = roots.Length == 0
-                    ? "未配置 SOLIDWORKS 设计库路径"
-                    : "搜索服务返回了设计库外结果，已拒绝显示";
+                    ? T("status.libraryNotConfigured")
+                    : T("status.outsideLibraryRejected");
                 PublishState(null);
                 return;
             }
@@ -567,7 +585,7 @@ namespace SwSearch.SolidWorksAddin
             {
                 if (generation != _resultSetGeneration) return;
                 _explicitAppExitMarked = false;
-                _status = "后台更新暂不可用";
+                _status = T("status.bgUnavailable");
                 PublishState(null);
             });
         }
@@ -662,8 +680,8 @@ namespace SwSearch.SolidWorksAddin
             _explicitAppExitMarked = false;
             _connectionFailed = true;
             _status = exception is BrokerProtocolMismatchException
-                ? "搜索服务版本不匹配：" + exception.Message
-                : "后台更新暂不可用";
+                ? T("prefix.versionMismatch") + exception.Message
+                : T("status.bgUnavailable");
             PublishState(null);
         }
 
@@ -690,7 +708,7 @@ namespace SwSearch.SolidWorksAddin
             bool changed = !_explicitAppExitMarked;
             _explicitAppExitMarked = true;
             _connectionFailed = true;
-            _status = "桌面搜索已从托盘退出。请启动 SOLIDWORKS 文件检索后再试。";
+            _status = T("status.appExited");
             if (changed || !String.IsNullOrEmpty(requestId))
             {
                 PublishState(requestId);
@@ -699,9 +717,12 @@ namespace SwSearch.SolidWorksAddin
 
         private string ResultCountStatus()
         {
-            if (ActiveLibraryRoots().Length == 0) return "文件库 · 未配置 SOLIDWORKS 设计库路径";
+            if (ActiveLibraryRoots().Length == 0) return T("result.libraryNotConfigured");
             long count = _totalResultCount.HasValue ? _totalResultCount.Value : _loadedCount;
-            return "文件库 · 共 " + count.ToString(CultureInfo.InvariantCulture) + " 个文件";
+            return TaskpaneUserText.F(
+                _uiLanguage,
+                "result.libraryFileCount",
+                count.ToString(CultureInfo.InvariantCulture));
         }
 
         private void PublishState(string requestId)
@@ -719,15 +740,19 @@ namespace SwSearch.SolidWorksAddin
                         kind = "library",
                         rootPath = String.Empty,
                         roots = ActiveLibraryRoots(),
-                        summary = "全部设计库"
+                        summary = T("scope.allLibraries")
                     },
                     busy = _searchCoordinator.ActiveRequestCount != 0,
                     canRetry = _connectionFailed && !_explicitAppExitMarked,
                     resultSummary = _totalResultCount.HasValue
-                        ? _totalResultCount.Value.ToString(CultureInfo.InvariantCulture) + " 个结果"
+                        ? TaskpaneUserText.F(
+                            _uiLanguage,
+                            "result.countSuffix",
+                            _totalResultCount.Value.ToString(CultureInfo.InvariantCulture))
                         : "",
                     rootPath = String.Empty,
                     status = _status,
+                    language = _uiLanguage,
                     hasMore = _hasMoreResults,
                     totalResultCount = _totalResultCount.HasValue ? _totalResultCount.Value : _loadedCount,
                     loading = _searchCoordinator.ActiveRequestCount != 0,

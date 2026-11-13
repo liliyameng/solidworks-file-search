@@ -37,6 +37,12 @@ public sealed record WebViewHostOptions
 {
     public WebUiView View { get; init; } = WebUiView.Main;
 
+    /// <summary>
+    /// Effective UI language (e.g. "zh-CN", "en") used for the first paint of
+    /// the page. Null leaves the page default (Simplified Chinese).
+    /// </summary>
+    public string? Language { get; init; }
+
     public string? AssetFolder { get; init; }
 
     public WebViewRuntimeConfiguration RuntimeConfiguration { get; init; } =

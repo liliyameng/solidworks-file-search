@@ -123,7 +123,10 @@ public sealed class Rc20PreferencesPanelTests
         var mainWindow = File.ReadAllText(Path.Combine(root, "src", "SwSearch.App", "MainWindow.xaml.cs"));
         var bridge = File.ReadAllText(Path.Combine(root, "src", "SwSearch.App", "DesktopWebBridge.cs"));
 
-        Assert.AreEqual(1, Count(mainWindow, "new CompositionWebViewHost"));
+        // Since the standalone preferences window landed, MainWindow creates
+        // exactly two composition WebView hosts: the main toolbar plus the
+        // on-demand settings window. The former single-host invariant is stale.
+        Assert.AreEqual(2, Count(mainWindow, "new CompositionWebViewHost"));
         Assert.IsFalse(File.Exists(Path.Combine(root, "src", "SwSearch.App", "SettingsWindow.xaml")));
         Assert.IsFalse(File.Exists(Path.Combine(root, "src", "SwSearch.App", "SettingsWindow.xaml.cs")));
         Assert.IsFalse(mainWindow.Contains("SettingsWindow", StringComparison.Ordinal));

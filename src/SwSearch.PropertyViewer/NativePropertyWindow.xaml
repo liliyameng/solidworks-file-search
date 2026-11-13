@@ -28,10 +28,10 @@
                 BorderThickness="0,0,0,1" Padding="16,7">
             <StackPanel>
                 <WrapPanel>
-                    <TextBlock Text="显示：" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding ShowLabel}" VerticalAlignment="Center" />
                     <ComboBox Width="150" ItemsSource="{Binding ModeOptions}"
                               SelectedIndex="{Binding SelectedModeIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    <TextBlock Text="配置：" Margin="20,0,0,0" VerticalAlignment="Center"
+                    <TextBlock Text="{Binding ConfigurationLabel}" Margin="20,0,0,0" VerticalAlignment="Center"
                                Visibility="{Binding ConfigurationSelectorVisibility}" />
                     <ComboBox Width="220" ItemsSource="{Binding Configurations}"
                               SelectedItem="{Binding SelectedConfiguration, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -79,9 +79,9 @@
                 </Style>
             </DataGrid.Resources>
             <DataGrid.Columns>
-                <DataGridTextColumn Header="属性名称" Binding="{Binding Name}" Width="300"
+                <DataGridTextColumn x:Name="NameColumn" Header="属性名称" Binding="{Binding Name}" Width="300"
                                     ElementStyle="{StaticResource WrappedCellText}" />
-                <DataGridTextColumn Header="属性值" Binding="{Binding Value}" Width="*"
+                <DataGridTextColumn x:Name="ValueColumn" Header="属性值" Binding="{Binding Value}" Width="*"
                                     ElementStyle="{StaticResource WrappedCellText}" />
             </DataGrid.Columns>
         </DataGrid>

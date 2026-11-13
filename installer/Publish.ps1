@@ -1,6 +1,6 @@
 ﻿[CmdletBinding()]
 param(
-    [string]$Version = '1.3.16',
+    [string]$Version = '1.3.18',
     [string]$OutputDirectory = '',
     [string]$StageDirectory = '',
     [switch]$SkipPrePublishValidation

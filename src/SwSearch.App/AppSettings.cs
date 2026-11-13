@@ -1,6 +1,8 @@
 using System.IO;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 using SwSearch.Contracts;
 
 namespace SwSearch.App;
@@ -128,7 +130,8 @@ public sealed record AppSettings(
     string? PropertyCardPath = null,
     int SchemaVersion = 3,
     IReadOnlyList<string>? PropertyDisplayOrder = null,
-    IReadOnlyList<double>? NativeShellColumnRatios = null)
+    IReadOnlyList<double>? NativeShellColumnRatios = null,
+    string? Language = null)
 {
     public static AppSettings Default { get; } = new(
         DiscoveryPreference.Automatic,
@@ -319,9 +322,16 @@ public sealed class JsonAppSettingsStore : IAppSettingsStore
             PropertyCardPath = NormalizePropertyCardPath(settings.PropertyCardSource, settings.PropertyCardPath),
             PropertyDisplayOrder = settings.NormalizedPropertyDisplayOrder.ToArray(),
             NativeShellColumnRatios = settings.NormalizedNativeShellColumnRatios.ToArray(),
+            Language = settings.Language,
         };
         var temporary = SettingsPath + "." + Guid.NewGuid().ToString("N") + ".tmp";
         var content = JsonSerializer.SerializeToUtf8Bytes(normalized, JsonOptions);
+        if (string.IsNullOrEmpty(normalized.Language))
+        {
+            // The preferences repository owns the "language" key. Column/layout
+            // saves must never erase it, so splice the persisted value back in.
+            content = PreservePersistedLanguage(content);
+        }
         await Task.Yield();
         cancellationToken.ThrowIfCancellationRequested();
         return new PreparedJsonSettingsSave(_saveExecutor, temporary, SettingsPath, content);
@@ -400,13 +410,46 @@ public sealed class JsonAppSettingsStore : IAppSettingsStore
                 NormalizePropertyCardPath(document.PropertyCardSource, document.PropertyCardPath),
                 3,
                 PropertyDisplayOrderDefaults.Normalize(document.PropertyDisplayOrder),
-                NativeShellColumnRatioDefaults.Normalize(document.NativeShellColumnRatios));
+                NativeShellColumnRatioDefaults.Normalize(document.NativeShellColumnRatios),
+                document.Language);
             return true;
         }
         catch (Exception exception) when (
             exception is IOException or UnauthorizedAccessException or JsonException or ArgumentException)
         {
             return false;
+        }
+    }
+
+    private byte[] PreservePersistedLanguage(byte[] serialized)
+    {
+        try
+        {
+            if (!File.Exists(SettingsPath))
+            {
+                return serialized;
+            }
+            string? persisted;
+            using (var stream = new FileStream(
+                       SettingsPath,
+                       FileMode.Open,
+                       FileAccess.Read,
+                       FileShare.ReadWrite | FileShare.Delete))
+            {
+                persisted = (JsonNode.Parse(stream) as JsonObject)?["language"]?.GetValue<string>();
+            }
+            if (string.IsNullOrEmpty(persisted) ||
+                JsonNode.Parse(serialized) is not JsonObject document)
+            {
+                return serialized;
+            }
+            document["language"] = persisted;
+            return JsonSerializer.SerializeToUtf8Bytes(document, JsonOptions);
+        }
+        catch (Exception exception) when (
+            exception is IOException or UnauthorizedAccessException or JsonException or ArgumentException)
+        {
+            return serialized;
         }
     }
 
@@ -421,6 +464,9 @@ public sealed class JsonAppSettingsStore : IAppSettingsStore
         public string? PropertyCardPath { get; set; }
         public string[]? PropertyDisplayOrder { get; set; }
         public double[]? NativeShellColumnRatios { get; set; }
+
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? Language { get; set; }
     }
 }
 

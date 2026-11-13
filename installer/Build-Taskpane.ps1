@@ -46,6 +46,7 @@ $icon = Join-Path $root 'src\Assets\Brand\SwSearch.ico'
 $sources = @(
     Get-ChildItem -LiteralPath $source -Filter '*.cs' | Sort-Object Name | Select-Object -ExpandProperty FullName
     Join-Path $root 'src\Shared\WindowsScopePath.cs'
+    Join-Path $root 'src\Shared\UiLanguage.cs'
 )
 if ($sources.Count -lt 5) { throw 'Taskpane source set is incomplete.' }
 $arguments = @(

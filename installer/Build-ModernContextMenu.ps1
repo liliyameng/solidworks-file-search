@@ -1,8 +1,8 @@
 ﻿[CmdletBinding()]
 param(
     [string]$Publisher = 'CN=SwSearch Local Package Publisher',
-    [string]$Version = '1.3.16.0',
-    [string]$ProductVersion = '1.3.16',
+    [string]$Version = '1.3.18.0',
+    [string]$ProductVersion = '1.3.18',
     [string]$PfxPath = '',
     [string]$PfxPasswordEnvironmentVariable = '',
     [string]$OutputDirectory = (Join-Path $PSScriptRoot '..\artifacts\modern-context-menu')

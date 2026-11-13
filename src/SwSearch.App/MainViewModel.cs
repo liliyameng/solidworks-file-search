@@ -5,6 +5,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Media;
 using SwSearch.Contracts;
+using SwSearch.WebUi;
 using Brush = System.Windows.Media.Brush;
 using Color = System.Windows.Media.Color;
 using SolidColorBrush = System.Windows.Media.SolidColorBrush;
@@ -153,6 +154,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     private readonly ISettingsPersistenceDiagnosticSink _settingsDiagnostics;
     private readonly CancellationTokenSource _lifetime = new();
     private AppSettings _settings;
+    private string _uiLanguageEffective = UiLanguage.ResolveSystem();
     private CancellationTokenSource? _searchCancellation;
     private CancellationTokenSource? _countCancellation;
     private CancellationTokenSource? _refreshCancellation;
@@ -167,6 +169,8 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     private Brush _statusBrush = WarningBrush;
     private string _resultSummary = "正在读取文件";
     private string _runtimeSummary = "索引状态读取中";
+    // Initial strings above are replaced in the constructor once the
+    // effective UI language is known, so the first paint is localized.
     private CompositeIndexProgress _indexProgress = CompositeIndexProgress.Waiting;
     private DiscoveryPreferenceOption _selectedDiscoveryOption;
     private string _networkRootsText;
@@ -230,6 +234,10 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         _settingsPersistence = new SettingsPersistenceCoordinator(PrepareSettingsSnapshot);
         _settingsDiagnostics = settingsDiagnostics;
         _settings = initialSettings ?? AppSettings.Default;
+        _uiLanguageEffective = UiLanguage.ResolveEffective(UiLanguage.SanitizeConfigured(_settings.Language ?? string.Empty));
+        _statusText = T("status.connecting");
+        _resultSummary = T("summary.reading");
+        _runtimeSummary = T("runtime.readingState");
         SearchModes =
         [
             new(SearchMode.All, "全部"),
@@ -409,14 +417,14 @@ public sealed class MainViewModel : ObservableObject, IDisposable
             }
         }
     }
-    public string PauseButtonText => IsBackgroundPaused ? "恢复后台处理" : "暂停后台处理";
+    public string PauseButtonText => IsBackgroundPaused ? T("pause.resume") : T("pause.pause");
     public SearchScope CurrentScope => _scope;
     internal long UserStateGeneration => Volatile.Read(ref _userStateGeneration);
     public bool IsFolderScope => _scope.Kind == SearchScopeKind.Folder;
     public Visibility ScopeBannerVisibility => IsFolderScope ? Visibility.Visible : Visibility.Collapsed;
     public string ScopeSummary => IsFolderScope
-        ? $"当前文件夹及全部子文件夹：{_scope.RootPath}"
-        : "全机范围";
+        ? TF("scope.currentFolderWithPath", _scope.RootPath)
+        : T("scope.allMachines");
 
     public Task StartAsync()
     {
@@ -449,6 +457,8 @@ public sealed class MainViewModel : ObservableObject, IDisposable
                 DiscoveryPreference = DiscoveryPreference.Automatic,
                 BackgroundPaused = false,
             };
+            _uiLanguageEffective = UiLanguage.ResolveEffective(UiLanguage.SanitizeConfigured(settings.Language ?? string.Empty));
+            _metadataProgressEpochTracker.Language = _uiLanguageEffective;
             SelectedDiscoveryOption = DiscoveryOptions.First(option => option.Value == DiscoveryPreference.Automatic);
             NetworkRootsText = string.Join(Environment.NewLine, settings.NetworkRoots);
             IsBackgroundPaused = false;
@@ -471,13 +481,13 @@ public sealed class MainViewModel : ObservableObject, IDisposable
             _scope = SearchScope.Folder(path);
             MarkUserStateChanged();
             RaiseScopeChanged();
-            StatusText = "当前文件夹及全部子文件夹。";
+            StatusText = T("status.folderScopeCurrent");
             StatusBrush = NormalBrush;
             _ = ScheduleSearchAsync(true);
         }
         catch (Exception exception) when (exception is ArgumentException or IOException or NotSupportedException)
         {
-            StatusText = $"文件夹范围无效：{exception.Message}";
+            StatusText = TF("status.folderScopeInvalid", exception.Message);
             StatusBrush = ErrorBrush;
         }
     }
@@ -487,19 +497,19 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         _scope = SearchScope.AllMachine;
         MarkUserStateChanged();
         RaiseScopeChanged();
-        StatusText = "已恢复全机范围。";
+            StatusText = T("status.scopeRestored");
         StatusBrush = NormalBrush;
         _ = ScheduleSearchAsync(true);
     }
 
-    public bool Open(SearchResultItem result) => RunFileAction(() => _fileActions.Open(result.FullPath), "已请求打开文件");
-    public bool Reveal(SearchResultItem result) => RunFileAction(() => _fileActions.Reveal(result.FullPath), "已在资源管理器中定位");
-    public bool CopyPath(SearchResultItem result) => RunFileAction(() => _fileActions.CopyPath(result.FullPath), "完整路径已复制");
-    public bool ViewProperties(SearchResultItem result) => RunFileAction(() => _fileActions.ViewProperties(result.FullPath), "已启动属性查看器");
+    public bool Open(SearchResultItem result) => RunFileAction(() => _fileActions.Open(result.FullPath), T("action.openRequested"));
+    public bool Reveal(SearchResultItem result) => RunFileAction(() => _fileActions.Reveal(result.FullPath), T("action.revealed"));
+    public bool CopyPath(SearchResultItem result) => RunFileAction(() => _fileActions.CopyPath(result.FullPath), T("action.pathCopied"));
+    public bool ViewProperties(SearchResultItem result) => RunFileAction(() => _fileActions.ViewProperties(result.FullPath), T("action.viewerLaunched"));
 
     public void ReportFileActionFailure(string message)
     {
-        StatusText = $"操作失败：{message}";
+        StatusText = TF("status.actionFailed", message);
         StatusBrush = ErrorBrush;
     }
 
@@ -510,7 +520,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         ReplaceColumnEditor(snapshot.NormalizedColumns);
         NetworkRootsText = string.Join(Environment.NewLine, snapshot.NetworkRoots);
         var generation = UserStateGeneration;
-        StatusText = "设置已应用，正在后台保存…";
+        StatusText = T("status.settingsApplied");
         StatusBrush = NormalBrush;
         _ = PersistSettingsInBackgroundAsync(snapshot, generation);
     }
@@ -547,7 +557,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     internal void ReportSettingsPersistenceFailure(Exception exception)
     {
         if (_disposed) return;
-        StatusText = $"状态已生效，但设置未保存（{exception.GetType().Name}）。";
+        StatusText = TF("status.stateAppliedNotSaved", exception.GetType().Name);
         StatusBrush = WarningBrush;
         _settingsDiagnostics.TryWrite("SETTINGS_PERSISTENCE_FAILED", exception.GetType().Name);
     }
@@ -564,7 +574,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     {
         if (!_disposed)
         {
-            StatusText = $"状态已生效，但设置未保存（{exception.GetType().Name}）。";
+            StatusText = TF("status.stateAppliedNotSaved", exception.GetType().Name);
             StatusBrush = WarningBrush;
         }
         _settingsDiagnostics.TryWrite("SETTINGS_PERSISTENCE_FAILED", exception.GetType().Name);
@@ -583,12 +593,28 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         CancellationToken cancellationToken = default) =>
         _settingsDiagnostics.StopAsync(timeout, cancellationToken);
 
+    /// <summary>Effective UI language used for every user-facing string this model produces.</summary>
+    public string UiLanguageEffective => _uiLanguageEffective;
+
+    private string T(string key) => AppUiText.Get(_uiLanguageEffective, key);
+
+    private string TF(string key, params object?[] args) => AppUiText.F(_uiLanguageEffective, key, args);
+
+    internal void UpdateLanguageInMemory(string? configured)
+    {
+        var sanitized = UiLanguage.SanitizeConfigured(configured ?? string.Empty);
+        _settings = _settings with { Language = sanitized };
+        _uiLanguageEffective = UiLanguage.ResolveEffective(sanitized);
+        _metadataProgressEpochTracker.Language = _uiLanguageEffective;
+    }
+
     internal void ApplyPersistedSettings(AppSettings settings)
     {
         _settings = settings;
+        _uiLanguageEffective = UiLanguage.ResolveEffective(UiLanguage.SanitizeConfigured(settings.Language ?? string.Empty));
         ReplaceColumnEditor(settings.NormalizedColumns);
         NetworkRootsText = string.Join(Environment.NewLine, settings.NetworkRoots);
-        StatusText = "设置已保存；网络根目录将在 Broker 下次启动时生效。";
+        StatusText = T("status.settingsSavedBroker");
         StatusBrush = NormalBrush;
     }
 
@@ -652,12 +678,13 @@ public sealed class MainViewModel : ObservableObject, IDisposable
             var progress = await runtime.GetProgressAsync(cancellationToken);
             var rawProjection = CreateIndexProgress(
                 progress,
-                Volatile.Read(ref _hasCommittedFileIndex) != 0);
+                Volatile.Read(ref _hasCommittedFileIndex) != 0,
+                _uiLanguageEffective);
             var projected = _metadataProgressEpochTracker.Stabilize(
                 progress.MetadataProgressEpoch,
                 progress.MetadataProgressEpochSession,
                 rawProjection);
-            RuntimeSummary = CreateRuntimeSummary(progress, projected);
+            RuntimeSummary = CreateRuntimeSummary(progress, projected, _uiLanguageEffective);
             IndexProgress = projected;
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -672,9 +699,12 @@ public sealed class MainViewModel : ObservableObject, IDisposable
 
     internal static CompositeIndexProgress CreateIndexProgress(
         RuntimeProgressSnapshot progress,
-        bool hasCommittedFileIndex = false)
+        bool hasCommittedFileIndex = false,
+        string? language = null)
     {
         ArgumentNullException.ThrowIfNull(progress);
+        var effectiveLanguage = language ?? UiLanguage.ResolveSystem();
+        string L(string key) => AppUiText.Get(effectiveLanguage, key);
         var legacy = progress.Metadata;
         var discovery = progress.Discovery;
         var metadata = progress.MetadataService;
@@ -803,21 +833,21 @@ public sealed class MainViewModel : ObservableObject, IDisposable
                          IsMetadataRecoveryCode(metadataCode);
         var unavailable = metadataState == RuntimeServiceState.Unavailable;
         var stalled = recovering || unavailable;
-        var storage = ProjectStorageStatus(progress);
+        var storage = ProjectStorageStatus(progress, effectiveLanguage);
         var (_, statusKind) = storage.Message is not null
             ? ($" · {storage.Message}", storage.StatusKind)
             : (metadataState, recovering, pending) switch
             {
-                (_, true, _) => (" · 属性处理超时，正在自动恢复", "metadata-recovery"),
-                (RuntimeServiceState.Unavailable, _, _) => (" · 属性宿主无法启动", "metadata-unavailable"),
-                (RuntimeServiceState.Running, _, _) => (" · 属性更新中", "active"),
-                (RuntimeServiceState.Paused, _, _) => (" · 属性已暂停", "paused"),
-                (RuntimeServiceState.Idle, _, > 0) => (" · 属性等待更新", "pending"),
+                (_, true, _) => (L("meta.timeoutRecovery"), "metadata-recovery"),
+                (RuntimeServiceState.Unavailable, _, _) => (L("meta.hostUnavailable"), "metadata-unavailable"),
+                (RuntimeServiceState.Running, _, _) => (L("meta.updating"), "active"),
+                (RuntimeServiceState.Paused, _, _) => (L("meta.paused"), "paused"),
+                (RuntimeServiceState.Idle, _, > 0) => (L("meta.pending"), "pending"),
                 (RuntimeServiceState.Idle, _, _) when currentMetadataPercent is >= 100d && skipped > 0 =>
-                    (" · 属性处理已完成，部分云端文件仅按文件名索引", "complete-with-skips"),
+                    (L("meta.completeWithSkips"), "complete-with-skips"),
                 (RuntimeServiceState.Idle, _, _) when currentMetadataPercent is >= 100d =>
-                    (" · 属性已完成", "complete"),
-                (_, _, > 0) => (" · 属性等待更新", "pending"),
+                    (L("meta.complete"), "complete"),
+                (_, _, > 0) => (L("meta.pending"), "pending"),
                 _ => (string.Empty, "normal"),
             };
         var label = CreateVisibleProgressText(
@@ -842,6 +872,9 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         private string? _observedSession;
         private double? _visibleCurrentMetadataPercent;
         private CompositeIndexProgress? _lastProjection;
+
+        /// <summary>Effective UI language supplied by the view model for labels.</summary>
+        public string? Language { get; set; }
 
         public CompositeIndexProgress Stabilize(
             long metadataProgressEpoch,
@@ -915,7 +948,8 @@ public sealed class MainViewModel : ObservableObject, IDisposable
             var label = CreateVisibleProgressText(
                 projection.FilePercent,
                 projection.CachedCoveragePercent,
-                visible);
+                visible,
+                Language);
             var stabilized = projection with
             {
                 CurrentMetadataPercent = visible,
@@ -929,27 +963,30 @@ public sealed class MainViewModel : ObservableObject, IDisposable
 
     internal static string CreateRuntimeSummary(
         RuntimeProgressSnapshot progress,
-        CompositeIndexProgress? projected = null)
+        CompositeIndexProgress? projected = null,
+        string? language = null)
     {
         ArgumentNullException.ThrowIfNull(progress);
-        projected ??= CreateIndexProgress(progress);
-        var storageMessage = ProjectStorageStatus(progress).Message;
+        var effectiveLanguage = language ?? UiLanguage.ResolveSystem();
+        string L(string key) => AppUiText.Get(effectiveLanguage, key);
+        projected ??= CreateIndexProgress(progress, language: effectiveLanguage);
+        var storageMessage = ProjectStorageStatus(progress, effectiveLanguage).Message;
         var metadata = progress.Metadata;
         var operation = projected.StatusKind switch
         {
-            "storage-maintenance" or "storage-blocked" => storageMessage ?? "属性更新中",
-            "pending" => "属性等待更新",
-            "metadata-recovery" => "属性处理超时，正在自动恢复",
-            "metadata-unavailable" => "属性宿主无法启动",
-            "paused" => "已暂停",
-            "complete-with-skips" => "属性处理已完成，部分云端文件仅按文件名索引",
-            "complete" => "已完成",
-            _ => progress.IsPaused ? "已暂停" : "运行中",
+            "storage-maintenance" or "storage-blocked" => storageMessage ?? L("runtime.metaActiveShort"),
+            "pending" => L("runtime.pendingShort"),
+            "metadata-recovery" => L("meta.timeoutRecovery").TrimStart(' ', '·').TrimStart(),
+            "metadata-unavailable" => L("meta.hostUnavailable").TrimStart(' ', '·').TrimStart(),
+            "paused" => L("runtime.pausedShort"),
+            "complete-with-skips" => L("meta.completeWithSkips").TrimStart(' ', '·').TrimStart(),
+            "complete" => L("runtime.completeShort"),
+            _ => progress.IsPaused ? L("runtime.pausedShort") : L("runtime.runningShort"),
         };
-        var skipped = metadata.SkippedCount > 0 ? $" / 已跳过 {metadata.SkippedCount:N0}" : string.Empty;
-        return $"{DescribeDiscoverySource(progress.DiscoverySource)} · 文件 {metadata.DiscoveredFileCount:N0} · " +
-               $"属性完成 {metadata.CompletedCount:N0} / 部分 {metadata.PartialCount:N0} / " +
-               $"待处理 {metadata.PendingCount:N0} / 失败 {metadata.FailedCount:N0}{skipped} · {operation}";
+        var skipped = metadata.SkippedCount > 0 ? AppUiText.F(effectiveLanguage, "runtime.skipped", metadata.SkippedCount) : string.Empty;
+        return $"{DescribeDiscoverySource(progress.DiscoverySource, effectiveLanguage)} · {AppUiText.F(effectiveLanguage, "runtime.files", metadata.DiscoveredFileCount)} · " +
+               $"{AppUiText.F(effectiveLanguage, "runtime.completed", metadata.CompletedCount)} / {AppUiText.F(effectiveLanguage, "runtime.partial", metadata.PartialCount)} / " +
+               $"{AppUiText.F(effectiveLanguage, "runtime.pendingCount", metadata.PendingCount)} / {AppUiText.F(effectiveLanguage, "runtime.failed", metadata.FailedCount)}{skipped} · {operation}";
     }
 
     private static bool IsMetadataRecoveryCode(string code) =>
@@ -957,8 +994,12 @@ public sealed class MainViewModel : ObservableObject, IDisposable
             "METADATA_FILE_TIMEOUT" or
             "METADATA_TIMEOUT_DEFERRED";
 
-    private static StorageStatusProjection ProjectStorageStatus(RuntimeProgressSnapshot progress)
+    private static StorageStatusProjection ProjectStorageStatus(
+        RuntimeProgressSnapshot progress,
+        string? language = null)
     {
+        var effectiveLanguage = language ?? UiLanguage.ResolveSystem();
+        string L(string key) => AppUiText.Get(effectiveLanguage, key);
         var reason = progress.StoragePauseReason?.Trim();
         var phase = progress.StorageMaintenancePhase?.Trim();
         var recoveryFailed = string.Equals(phase, "recovery-failed", StringComparison.OrdinalIgnoreCase) ||
@@ -970,35 +1011,35 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         if (recoveryFailed)
         {
             return new StorageStatusProjection(
-                "索引维护暂时失败，后台将自动重试",
+                L("runtime.storageRetry"),
                 "storage-maintenance",
                 IsFailure: false);
         }
         if (string.Equals(reason, "WAL_PRESSURE", StringComparison.OrdinalIgnoreCase))
         {
             return new StorageStatusProjection(
-                "正在整理索引缓存",
+                L("runtime.compacting"),
                 "storage-maintenance",
                 IsFailure: false);
         }
         if (maintenanceActive)
         {
             return new StorageStatusProjection(
-                "正在整理索引空间，属性更新将自动继续",
+                L("runtime.compactingAuto"),
                 "storage-maintenance",
                 IsFailure: false);
         }
         if (progress.MetadataWritesPaused && IsStorageCapacityCode(reason))
         {
             return new StorageStatusProjection(
-                "索引空间不足，属性更新已暂停",
+                L("runtime.storageFull"),
                 "storage-blocked",
                 IsFailure: true);
         }
         if (progress.MetadataWritesPaused)
         {
             return new StorageStatusProjection(
-                "属性更新已暂停",
+                L("runtime.storagePaused"),
                 "storage-blocked",
                 IsFailure: true);
         }
@@ -1021,28 +1062,35 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     private static string CreateVisibleProgressText(
         double? filePercent,
         double? cachedCoveragePercent,
-        double? currentMetadataPercent) =>
-        $"文件 {FormatPercent(filePercent)} · " +
-        $"可读取缓存 {FormatPercent(cachedCoveragePercent)} · " +
-        $"属性处理 {FormatPercent(currentMetadataPercent)}";
+        double? currentMetadataPercent,
+        string? language = null)
+    {
+        var effectiveLanguage = language ?? UiLanguage.ResolveSystem();
+        return AppUiText.F(
+            effectiveLanguage,
+            "progress.template",
+            FormatPercent(filePercent),
+            FormatPercent(cachedCoveragePercent),
+            FormatPercent(currentMetadataPercent));
+    }
 
-    private static string DescribeDiscoverySource(string? source)
+    private static string DescribeDiscoverySource(string? source, string language)
     {
         var value = source?.Trim() ?? string.Empty;
         if (value.Contains("EVERYTHING", StringComparison.OrdinalIgnoreCase) ||
             value.Contains("MFT", StringComparison.OrdinalIgnoreCase) ||
             value.Contains("NTFS", StringComparison.OrdinalIgnoreCase))
         {
-            return "快速索引";
+            return AppUiText.Get(language, "sourceLabel.fast");
         }
         if (value.Contains("BUILTIN", StringComparison.OrdinalIgnoreCase) ||
             value.Contains("DIRECTORY", StringComparison.OrdinalIgnoreCase))
         {
-            return "内置扫描";
+            return AppUiText.Get(language, "sourceLabel.builtin");
         }
         return value.Any(static character => character is >= '\u4e00' and <= '\u9fff')
             ? value
-            : "文件索引";
+            : AppUiText.Get(language, "sourceLabel.files");
     }
 
     private static long SaturatingSum(params long[] values)
@@ -1191,7 +1239,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
             _countCancellation = null;
             if (Results.Count == 0)
             {
-                ResultSummary = "正在搜索…";
+                ResultSummary = T("summary.searching");
             }
         }
         try
@@ -1232,7 +1280,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         if (!preserveExistingResults)
         {
             IsBusy = true;
-            StatusText = ScopeStatus(windowRequest ? "正在读取文件…" : "正在搜索…");
+            StatusText = ScopeStatus(windowRequest ? T("status.readingFiles") : T("summary.searching"));
             StatusBrush = NormalBrush;
         }
         try
@@ -1325,7 +1373,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
             {
                 TotalResultCount = responseHits.Length;
             }
-            ResultSummary = TotalResultCount >= 0 ? $"共 {TotalResultCount:N0} 个文件" : "正在统计文件数…";
+            ResultSummary = TotalResultCount >= 0 ? TF("summary.totalFiles", TotalResultCount) : T("summary.counting");
             IsRetryVisible = IsBrokerFailureCapability(result.Capability.Code);
             if (result.State is { } state)
             {
@@ -1334,7 +1382,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
             else
             {
                 StatusText = ScopeStatus(result.Capability.State == CapabilityState.Available && Results.Count == 0
-                    ? IsFolderScope ? "范围内暂无结果。" : "未找到匹配项。"
+                    ? IsFolderScope ? T("summary.noResultsFolder") : T("summary.noMatches")
                     : NormalizeCapabilityMessage(result.Capability));
                 StatusBrush = result.Capability.State == CapabilityState.Available ? NormalBrush : WarningBrush;
             }
@@ -1353,8 +1401,8 @@ public sealed class MainViewModel : ObservableObject, IDisposable
                 }
                 if (!preserveExistingResults)
                 {
-                    ResultSummary = Results.Count == 0 ? "共 0 个文件" : $"共 {Results.Count:N0} 个文件";
-                    StatusText = Results.Count == 0 ? "文件列表暂不可用，请重试。" : string.Empty;
+                    ResultSummary = Results.Count == 0 ? TF("summary.totalFiles", 0) : TF("summary.totalFiles", Results.Count);
+                    StatusText = Results.Count == 0 ? T("status.listUnavailable") : string.Empty;
                     StatusBrush = ErrorBrush;
                     IsRetryVisible = true;
                 }
@@ -1412,7 +1460,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
             if (!_disposed && resultSetId == CurrentResultSetId)
             {
                 TotalResultCount = count;
-                ResultSummary = $"共 {count:N0} 个文件";
+                ResultSummary = TF("summary.totalFiles", count);
             }
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -1477,7 +1525,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
             }
             catch (BrokerProtocolMismatchException exception)
             {
-                StatusText = $"搜索服务版本不匹配：{exception.Message}";
+                StatusText = TF("status.versionMismatch", exception.Message);
                 StatusBrush = ErrorBrush;
                 IsRetryVisible = true;
                 stateChanged = true;
@@ -1487,7 +1535,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
                 // Keep the already rendered local cache visible and report the
                 // actual failing phase. A response timeout must never be
                 // flattened into a pipe-connect failure.
-                StatusText = ScopeStatus($"已显示本地缓存；{exception.Message}");
+                StatusText = ScopeStatus(TF("status.cacheShown", exception.Message));
                 StatusBrush = exception.Retryable ? WarningBrush : ErrorBrush;
                 IsRetryVisible = true;
                 stateChanged = true;
@@ -1619,11 +1667,11 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         StatusBrush = state.Capability.State == CapabilityState.Unavailable ? WarningBrush : NormalBrush;
         StatusText = ScopeStatus(state switch
         {
-            { CacheAvailable: true, BackgroundUpdating: true } => $"共 {state.FileCount:N0} 个文件",
-            { CacheAvailable: false } => "首次建立索引 · 可继续输入，发现文件后会自动更新",
+            { CacheAvailable: true, BackgroundUpdating: true } => TF("summary.totalFiles", state.FileCount),
+            { CacheAvailable: false } => T("summary.firstIndex"),
             { Phase: BrokerRuntimePhase.Ready, LastUpdatedUtc: { } updated } =>
-                $"索引就绪 · {state.FileCount:N0} 个文件 · 更新于 {updated.ToLocalTime():HH:mm:ss}",
-            { Phase: BrokerRuntimePhase.Ready } => $"索引就绪 · {state.FileCount:N0} 个文件",
+                TF("summary.indexReadyAt", state.FileCount, updated.ToLocalTime()),
+            { Phase: BrokerRuntimePhase.Ready } => TF("summary.indexReady", state.FileCount),
             _ => NormalizeCapabilityMessage(state.Capability),
         });
         if (requeryOnRevisionChange && (recoveredConnection || changed || becameQueryable))
@@ -1753,7 +1801,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
             stateClient.RetryConnection();
         }
         IsRetryVisible = false;
-        StatusText = "正在重试连接搜索服务…";
+        StatusText = T("status.reconnecting");
         StatusBrush = WarningBrush;
         var preserveCurrentWindow = Results.Count > 0;
         _ = ScheduleSearchAsync(
@@ -1769,7 +1817,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         {
             return;
         }
-        StatusText = Results.Count == 0 ? "正在准备文件列表…" : $"共 {Results.Count:N0} 个文件";
+        StatusText = Results.Count == 0 ? T("status.preparingList") : TF("summary.totalFiles", Results.Count);
         StatusBrush = NormalBrush;
         try
         {
@@ -1783,11 +1831,11 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         }
         catch (OperationCanceledException)
         {
-            StatusText = "刷新已取消。";
+            StatusText = T("status.refreshCancelled");
         }
         catch (Exception)
         {
-            StatusText = "刷新失败，已保留当前索引，请稍后重试。";
+            StatusText = T("status.refreshFailed");
             StatusBrush = ErrorBrush;
             IsRetryVisible = true;
         }
@@ -1867,34 +1915,39 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     }
 
     private string ScopeStatus(string status) =>
-        IsFolderScope ? $"当前文件夹范围 · {status}" : status;
+        IsFolderScope ? TF("status.scopePrefix", status) : status;
 
-    internal static string NormalizeCapabilityMessage(RuntimeCapability capability) => capability.Code switch
+    internal static string NormalizeCapabilityMessage(RuntimeCapability capability, string? language = null)
     {
-        "INDEX_READY" or "INDEX_CACHE_READY" => "索引服务正常。",
-        "INDEX_EMPTY" or "INDEX_INITIALIZING" => "首次建立索引 · 可继续输入",
-        "INDEX_CACHE_STALE" => "文件列表正在更新",
-        "DISCOVERY_PARTIAL" => "部分文件夹暂时无法读取，已保留原有索引，其余文件夹已更新。",
-        "DISCOVERY_SNAPSHOT_INCOMPLETE" => "部分搜索位置当前不可用，已保留已有索引。",
-        "DISCOVERY_QUERY_FAILED" or "DISCOVERY_LOOP_FAILED" => "文件索引本轮未完成，已有索引仍可搜索。",
-        "BUILTIN_DISCOVERY_KNOWN_ROOT_OFFLINE" => "部分已索引磁盘当前不可用，已保留已有索引。",
-        "BUILTIN_DISCOVERY_NO_ONLINE_ROOT" => "当前没有可访问的搜索位置，已有索引仍可搜索。",
-        "BUILTIN_DISCOVERY_PROBE_FAILED" => "暂时无法检查搜索位置，已有索引仍可搜索。",
-        "METADATA_INITIALIZING" => "属性索引正在初始化，已有缓存仍可搜索。",
+        var effectiveLanguage = language ?? UiLanguage.ResolveSystem();
+        string L(string key) => AppUiText.Get(effectiveLanguage, key);
+        return capability.Code switch
+    {
+        "INDEX_READY" or "INDEX_CACHE_READY" => L("status.indexOk"),
+        "INDEX_EMPTY" or "INDEX_INITIALIZING" => L("status.firstIndex"),
+        "INDEX_CACHE_STALE" => L("status.listUpdating"),
+        "DISCOVERY_PARTIAL" => L("status.discoveryPartial"),
+        "DISCOVERY_SNAPSHOT_INCOMPLETE" => L("status.snapshotIncomplete"),
+        "DISCOVERY_QUERY_FAILED" or "DISCOVERY_LOOP_FAILED" => L("status.queryFailedKeep"),
+        "BUILTIN_DISCOVERY_KNOWN_ROOT_OFFLINE" => L("status.rootOffline"),
+        "BUILTIN_DISCOVERY_NO_ONLINE_ROOT" => L("status.noOnlineRoot"),
+        "BUILTIN_DISCOVERY_PROBE_FAILED" => L("status.probeFailed"),
+        "METADATA_INITIALIZING" => L("status.metaInitializing"),
         "METADATA_WORKER_UNAVAILABLE" or "METADATA_WORKER_RECOVERING" =>
-            "属性索引暂时不可用，文件名与已有属性仍可搜索。",
-        "BROKER_RECONNECTING" => "搜索服务正在重连；保留最近结果。",
-        "BROKER_DRAINING" => "旧版搜索服务正在退出；保留本地缓存并自动重连。",
-        "BROKER_CONNECT_TIMEOUT" => "搜索服务管道暂不可用；保留本地缓存并自动重连。",
-        "BROKER_RESPONSE_TIMEOUT" => "搜索服务已连接但未及时响应；保留本地缓存并自动重连。",
-        "BROKER_STARTUP_FAILED" => "搜索服务启动失败；请查看本地诊断记录。",
-        "LOCAL_INDEX_UNAVAILABLE" => "本地缓存正在迁移或暂时被占用；已保留当前结果，后台将自动重试。",
+            L("status.metaUnavailable"),
+        "BROKER_RECONNECTING" => L("status.brokerReconnecting"),
+        "BROKER_DRAINING" => L("status.brokerDraining"),
+        "BROKER_CONNECT_TIMEOUT" => L("status.brokerPipeUnavailable"),
+        "BROKER_RESPONSE_TIMEOUT" => L("status.brokerNoResponse"),
+        "BROKER_STARTUP_FAILED" => L("status.brokerStartupFailed"),
+        "LOCAL_INDEX_UNAVAILABLE" => L("status.localIndexBusy"),
         _ => ContainsChinese(capability.ChineseMessage)
             ? capability.ChineseMessage
             : capability.State == CapabilityState.Unavailable
-                ? "索引服务暂时不可用，已有索引仍可搜索。"
-                : "索引状态正在更新，已有索引仍可搜索。",
-    };
+                ? L("status.indexUnavailableRetry")
+                : L("status.indexStateUpdating"),
+        };
+    }
 
     private static bool ContainsChinese(string? text) =>
         text?.Any(static character => character is >= '\u4e00' and <= '\u9fff') == true;

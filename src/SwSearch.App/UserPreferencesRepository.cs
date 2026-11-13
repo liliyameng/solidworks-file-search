@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using SwSearch.Contracts;
 using SwSearch.Integration;
+using SwSearch.WebUi;
 
 namespace SwSearch.App;
 
@@ -30,7 +31,8 @@ internal sealed record UserPreferencesSnapshot(
     string? ConfigurationError = null,
     IReadOnlyList<string>? LibraryRoots = null,
     UserPreferenceIntegrationState? FilePropertiesMenu = null,
-    IReadOnlyList<string>? PropertyDisplayOrder = null);
+    IReadOnlyList<string>? PropertyDisplayOrder = null,
+    string Language = UiLanguage.Auto);
 
 internal sealed record UserPreferencesSaveRequest(
     bool Taskpane,
@@ -40,7 +42,8 @@ internal sealed record UserPreferencesSaveRequest(
     string PropertyCardPath,
     IReadOnlyList<string>? LibraryRoots = null,
     bool FilePropertiesMenu = false,
-    IReadOnlyList<string>? PropertyDisplayOrder = null);
+    IReadOnlyList<string>? PropertyDisplayOrder = null,
+    string Language = UiLanguage.Auto);
 
 internal sealed record UserPreferenceIntegrationSaveResult(
     UserPreferenceIntegrationTarget Target,
@@ -91,7 +94,14 @@ internal sealed class UserPreferencesRepository : IUserPreferencesRepository
     private readonly IUserPreferencesIntegrationBackend _integrations;
     private readonly TimeSpan _probeTimeout;
     private readonly TimeSpan _setTimeout;
+    private readonly Func<string> _language;
     private readonly SemaphoreSlim _operationGate = new(1, 1);
+
+    private static string DefaultLanguage() => UiLanguage.ResolveSystem();
+
+    private string T(string key) => AppUiText.Get(_language(), key);
+
+    private string TF(string key, params object?[] args) => AppUiText.F(_language(), key, args);
 
     internal static IUserPreferencesRepository CreateFailSoft(
         Func<IUserPreferencesRepository>? factory = null,
@@ -113,11 +123,13 @@ internal sealed class UserPreferencesRepository : IUserPreferencesRepository
         IUserPreferencesIntegrationBackend? integrations = null,
         TimeSpan? probeTimeout = null,
         TimeSpan? setTimeout = null,
-        string? pluginDefaultsPath = null)
+        string? pluginDefaultsPath = null,
+        Func<string>? languageResolver = null)
     {
         _settingsPath = Path.GetFullPath(
             settingsPath ?? Path.Combine(SwSearchDataPaths.DataDirectory, "settings.json"));
         _integrations = integrations ?? new UserPreferencesIntegrationBackend();
+        _language = languageResolver ?? DefaultLanguage;
         _pluginDefaultsPath = Path.GetFullPath(pluginDefaultsPath ?? Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
             "TuoChuang",
@@ -149,7 +161,8 @@ internal sealed class UserPreferencesRepository : IUserPreferencesRepository
                 configuration.Error,
                 Array.Empty<string>(),
                 ApplySavedIntent(filePropertiesMenu.Result, configuration.FilePropertiesMenuEnabled),
-                configuration.PropertyDisplayOrder);
+                configuration.PropertyDisplayOrder,
+                configuration.Language);
         }
         finally
         {
@@ -157,7 +170,7 @@ internal sealed class UserPreferencesRepository : IUserPreferencesRepository
         }
     }
 
-    private static UserPreferenceIntegrationState ApplySavedIntent(
+    private UserPreferenceIntegrationState ApplySavedIntent(
         UserPreferenceIntegrationState current,
         bool? savedIntent)
     {
@@ -168,7 +181,9 @@ internal sealed class UserPreferencesRepository : IUserPreferencesRepository
         return current with
         {
             IsEnabled = savedIntent.Value,
-            Message = $"已保存{(savedIntent.Value ? "启用" : "关闭")}意图；当前系统状态未同步：{current.Message}",
+            Message = TF(
+                savedIntent.Value ? "prefs.intentEnabled" : "prefs.intentDisabled",
+                current.Message),
         };
     }
 
@@ -184,6 +199,7 @@ internal sealed class UserPreferencesRepository : IUserPreferencesRepository
                 request.PropertyCardPath),
             LibraryRoots = Array.Empty<string>(),
             PropertyDisplayOrder = PropertyDisplayOrderDefaults.Normalize(request.PropertyDisplayOrder),
+            Language = UiLanguage.SanitizeConfigured(request.Language),
         };
 
         await _operationGate.WaitAsync(cancellationToken).ConfigureAwait(false);
@@ -199,7 +215,7 @@ internal sealed class UserPreferencesRepository : IUserPreferencesRepository
             {
                 return new UserPreferencesSaveResult(
                     false,
-                    $"本地偏好未保存：{SafeMessage(exception)}",
+                    TF("prefs.localSaveFailed", SafeMessage(exception)),
                     normalized,
                     Array.Empty<UserPreferenceIntegrationSaveResult>());
             }
@@ -247,7 +263,7 @@ internal sealed class UserPreferencesRepository : IUserPreferencesRepository
                 target,
                 enabled,
                 true,
-                enabled ? "已启用。" : "已关闭。");
+                enabled ? T("prefs.enabled") : T("prefs.disabled"));
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
@@ -260,7 +276,7 @@ internal sealed class UserPreferencesRepository : IUserPreferencesRepository
                 target,
                 enabled,
                 false,
-                $"{TargetDisplayName(target)}：{SafeMessage(exception)}");
+                TF("prefs.targetFailed", TargetDisplayName(target), SafeMessage(exception)));
         }
     }
 
@@ -274,7 +290,7 @@ internal sealed class UserPreferencesRepository : IUserPreferencesRepository
         {
             if (enabled)
             {
-                throw new InvalidOperationException($"{TargetDisplayName(target)}当前不可用：{current.Message}");
+                throw new InvalidOperationException(TF("prefs.targetUnavailable", TargetDisplayName(target), current.Message));
             }
             return;
         }
@@ -308,14 +324,14 @@ internal sealed class UserPreferencesRepository : IUserPreferencesRepository
         }
         catch (TimeoutException)
         {
-            return new UserPreferenceIntegrationState(false, false, "状态读取超时，可关闭面板后重试。");
+            return new UserPreferenceIntegrationState(false, false, T("prefs.readTimeout"));
         }
         catch (Exception exception) when (IsExpectedOperationFailure(exception))
         {
             return new UserPreferenceIntegrationState(
                 false,
                 false,
-                $"状态读取失败：{SafeMessage(exception)}");
+                TF("prefs.readFailed", SafeMessage(exception)));
         }
     }
 
@@ -327,7 +343,7 @@ internal sealed class UserPreferencesRepository : IUserPreferencesRepository
             _probeTimeout,
             cancellationToken);
 
-    private static async Task<T> RunBoundedAsync<T>(
+    private async Task<T> RunBoundedAsync<T>(
         Func<CancellationToken, Task<T>> operation,
         TimeSpan timeout,
         CancellationToken cancellationToken)
@@ -345,11 +361,13 @@ internal sealed class UserPreferencesRepository : IUserPreferencesRepository
         catch (OperationCanceledException) when (
             !cancellationToken.IsCancellationRequested && deadline.IsCancellationRequested)
         {
-            throw new TimeoutException("偏好设置操作超过时限。");
+            // Inside the generic RunBoundedAsync<T>, "T" would resolve to the
+            // type parameter, so use the text table directly here.
+            throw new TimeoutException(AppUiText.Get(_language(), "prefs.opTimeout"));
         }
     }
 
-    private static async Task RunBoundedAsync(
+    private async Task RunBoundedAsync(
         Func<CancellationToken, Task> operation,
         TimeSpan timeout,
         CancellationToken cancellationToken)
@@ -367,7 +385,7 @@ internal sealed class UserPreferencesRepository : IUserPreferencesRepository
         catch (OperationCanceledException) when (
             !cancellationToken.IsCancellationRequested && deadline.IsCancellationRequested)
         {
-            throw new TimeoutException("偏好设置操作超过时限。");
+            throw new TimeoutException(T("prefs.opTimeout"));
         }
     }
 
@@ -398,7 +416,7 @@ internal sealed class UserPreferencesRepository : IUserPreferencesRepository
                 return new StoredPreferences(
                     PropertyCardSourcePreference.Automatic,
                     string.Empty,
-                    "设置文件不是有效的 JSON 对象。",
+                    T("prefs.invalidSettingsJson"),
                     null,
                     null,
                     null);
@@ -411,6 +429,7 @@ internal sealed class UserPreferencesRepository : IUserPreferencesRepository
                        pathNode.ValueKind == JsonValueKind.String
                 ? pathNode.GetString()?.Trim() ?? string.Empty
                 : string.Empty;
+            var language = ReadLanguage(root);
             try
             {
                 path = NormalizePropertyCardPath(source, path);
@@ -427,7 +446,8 @@ internal sealed class UserPreferencesRepository : IUserPreferencesRepository
                     ReadOptionalBoolean(root, "startupEnabled"),
                     Array.Empty<string>(),
                     ReadOptionalBoolean(root, "filePropertiesMenuEnabled"),
-                    ReadPropertyDisplayOrder(root));
+                    ReadPropertyDisplayOrder(root),
+                    language);
             }
             catch (ArgumentException exception)
             {
@@ -437,7 +457,11 @@ internal sealed class UserPreferencesRepository : IUserPreferencesRepository
                     exception.Message,
                     ReadOptionalBoolean(root, "taskpaneEnabled"),
                     ReadOptionalBoolean(root, "folderMenuEnabled"),
-                    ReadOptionalBoolean(root, "startupEnabled"));
+                    ReadOptionalBoolean(root, "startupEnabled"),
+                    Array.Empty<string>(),
+                    ReadOptionalBoolean(root, "filePropertiesMenuEnabled"),
+                    ReadPropertyDisplayOrder(root),
+                    language);
             }
         }
         catch (JsonException)
@@ -445,7 +469,7 @@ internal sealed class UserPreferencesRepository : IUserPreferencesRepository
             return new StoredPreferences(
                 PropertyCardSourcePreference.Automatic,
                 ReadActivePluginPath(),
-                "设置文件 JSON 格式无效；下次保存将安全重建。",
+                    T("prefs.invalidJsonRetry"),
                 null,
                 null,
                 null);
@@ -456,7 +480,7 @@ internal sealed class UserPreferencesRepository : IUserPreferencesRepository
             return new StoredPreferences(
                 PropertyCardSourcePreference.Automatic,
                 ReadActivePluginPath(),
-                "设置文件暂时无法读取；主搜索仍可使用，可稍后在面板中重试。",
+                T("prefs.unreadable"),
                 null,
                 null,
                 null);
@@ -509,7 +533,7 @@ internal sealed class UserPreferencesRepository : IUserPreferencesRepository
     {
         cancellationToken.ThrowIfCancellationRequested();
         var directory = Path.GetDirectoryName(_settingsPath)
-            ?? throw new InvalidOperationException("设置文件目录不可用。");
+            ?? throw new InvalidOperationException(T("prefs.settingsDirUnavailable"));
         Directory.CreateDirectory(directory);
 
         JsonObject document;
@@ -541,6 +565,7 @@ internal sealed class UserPreferencesRepository : IUserPreferencesRepository
         document["folderMenuEnabled"] = request.FolderMenu;
         document["filePropertiesMenuEnabled"] = request.FilePropertiesMenu;
         document["startupEnabled"] = request.Startup;
+        document["language"] = request.Language;
         document.Remove("libraryRoots");
         document["propertyDisplayOrder"] = new JsonArray((request.PropertyDisplayOrder ?? Array.Empty<string>())
             .Select(static name => JsonValue.Create(name))
@@ -600,6 +625,11 @@ internal sealed class UserPreferencesRepository : IUserPreferencesRepository
         node.ValueKind is JsonValueKind.True or JsonValueKind.False
             ? node.GetBoolean()
             : null;
+
+    private static string ReadLanguage(JsonElement root) =>
+        root.TryGetProperty("language", out var node) && node.ValueKind == JsonValueKind.String
+            ? UiLanguage.SanitizeConfigured(node.GetString() ?? string.Empty)
+            : UiLanguage.Auto;
 
     private static IReadOnlyList<string> ReadLibraryRoots(JsonElement root)
     {
@@ -700,18 +730,18 @@ internal sealed class UserPreferencesRepository : IUserPreferencesRepository
             ? version
             : 0;
 
-    private static string TargetDisplayName(UserPreferenceIntegrationTarget target) => target switch
+    private string TargetDisplayName(UserPreferenceIntegrationTarget target) => target switch
     {
-        UserPreferenceIntegrationTarget.Taskpane => "SOLIDWORKS 右侧任务窗格",
-        UserPreferenceIntegrationTarget.FolderMenu => "Windows 文件夹右键搜索",
-        UserPreferenceIntegrationTarget.FilePropertiesMenu => "Windows 文件右键查看属性",
-        UserPreferenceIntegrationTarget.Startup => "开机自启",
+        UserPreferenceIntegrationTarget.Taskpane => T("target.taskpane"),
+        UserPreferenceIntegrationTarget.FolderMenu => T("target.folderMenu"),
+        UserPreferenceIntegrationTarget.FilePropertiesMenu => T("target.filePropertiesMenu"),
+        UserPreferenceIntegrationTarget.Startup => T("target.startup"),
         _ => "系统集成",
     };
 
-    private static string SafeMessage(Exception exception) =>
+    private string SafeMessage(Exception exception) =>
         string.IsNullOrWhiteSpace(exception.Message)
-            ? "系统未返回详细原因。"
+            ? T("prefs.noDetail")
             : exception.Message.Replace('\r', ' ').Replace('\n', ' ').Trim();
 
     private static bool IsExpectedOperationFailure(Exception exception) =>
@@ -730,7 +760,8 @@ internal sealed class UserPreferencesRepository : IUserPreferencesRepository
         bool? StartupEnabled,
         IReadOnlyList<string>? LibraryRoots = null,
         bool? FilePropertiesMenuEnabled = null,
-        IReadOnlyList<string>? PropertyDisplayOrder = null);
+        IReadOnlyList<string>? PropertyDisplayOrder = null,
+        string Language = UiLanguage.Auto);
 }
 
 internal sealed class UnavailableUserPreferencesRepository(string failureType)

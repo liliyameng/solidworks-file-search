@@ -26,6 +26,8 @@
   <ItemGroup>
     <Compile Include="..\SwSearch.SolidWorksAddin\TaskpaneShellResultsHost.cs"
              Link="Native\Shell\TaskpaneShellResultsHost.cs" />
+    <!-- Shared UI-language resolver, source-linked like WindowsScopePath. -->
+    <Compile Include="..\Shared\UiLanguage.cs" Link="UiLanguage.cs" />
   </ItemGroup>
 
   <!-- The SDK package references both WinForms and WPF facades on modern .NET.

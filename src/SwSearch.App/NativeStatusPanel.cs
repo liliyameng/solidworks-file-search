@@ -1,3 +1,4 @@
+using SwSearch.WebUi;
 using Forms = System.Windows.Forms;
 
 namespace SwSearch.App;
@@ -24,8 +25,8 @@ internal sealed class NativeStatusPanel : Forms.Panel
             AutoSize = true,
             AutoSizeMode = Forms.AutoSizeMode.GrowAndShrink,
             FlatStyle = Forms.FlatStyle.System,
-            Text = "重试文件视图",
-            AccessibleName = "重试原生文件视图",
+            Text = AppUiText.Get(UiLanguage.ResolveSystem(), "native.retryFileView"),
+            AccessibleName = AppUiText.Get(UiLanguage.ResolveSystem(), "native.retryFileViewAccessible"),
             Visible = false,
         };
 
@@ -49,6 +50,13 @@ internal sealed class NativeStatusPanel : Forms.Panel
     internal Forms.Label ResultCountLabel { get; }
 
     internal Forms.Button RetryButton { get; }
+
+    /// <summary>Re-applies the retry button texts for a newly effective UI language.</summary>
+    internal void ApplyLanguage(string language)
+    {
+        RetryButton.Text = AppUiText.Get(language, "native.retryFileView");
+        RetryButton.AccessibleName = AppUiText.Get(language, "native.retryFileViewAccessible");
+    }
 
     protected override void OnLayout(Forms.LayoutEventArgs eventArgs)
     {

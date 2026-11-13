@@ -160,7 +160,9 @@ public sealed class CompositionWebViewHost : Control
                 pendingEnvironment,
                 assetFolder);
             pendingController.CoreWebView2.Navigate(
-                WebViewOrigin.EntryPoint(_options.View).AbsoluteUri);
+                (string.IsNullOrEmpty(_options.Language)
+                    ? WebViewOrigin.EntryPoint(_options.View)
+                    : WebViewOrigin.EntryPoint(_options.View, _options.Language!)).AbsoluteUri);
 
             lock (_lifecycleGate)
             {

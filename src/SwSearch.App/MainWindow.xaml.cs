@@ -82,7 +82,8 @@ public partial class MainWindow : Window
         InitializeComponent();
         DataContext = viewModel;
         _settingsSaver = viewModel.SettingsPersistence;
-        _bridge = new DesktopWebBridge(viewModel, UserPreferencesRepository.CreateFailSoft());
+        _bridge = new DesktopWebBridge(viewModel, UserPreferencesRepository.CreateFailSoft(
+            () => new UserPreferencesRepository(languageResolver: () => viewModel.UiLanguageEffective)));
         _webViewIdleTeardownTimer = new DispatcherTimer(DispatcherPriority.Background)
         {
             Interval = TimeSpan.FromMinutes(5),
@@ -175,7 +176,7 @@ public partial class MainWindow : Window
         return host;
     }
 
-    private MainViewModel ViewModel => (MainViewModel)DataContext;
+    internal MainViewModel ViewModel => (MainViewModel)DataContext;
 
     internal bool CanApplyBackgroundSettings => !_closed;
 
@@ -1021,6 +1022,10 @@ public partial class MainWindow : Window
         _nativeColumnHeader.SetRatios(settings.NormalizedNativeShellColumnRatios);
         ScheduleNativeShellColumnConfiguration();
         ViewModel.ApplyLoadedSettings(settings);
+        if (_nativeResultsPanel is NativeStatusPanel nativeStatusPanel)
+        {
+            nativeStatusPanel.ApplyLanguage(ViewModel.UiLanguageEffective);
+        }
         _bridge.PublishState();
     }
 
@@ -1095,6 +1100,7 @@ public partial class MainWindow : Window
         _webView = new CompositionWebViewHost(new WebViewHostOptions
         {
             View = WebUiView.MainToolbar,
+            Language = ViewModel.UiLanguageEffective,
             RuntimeConfiguration = WebViewRuntimeConfiguration.Evergreen,
         });
         WebToolbarContainer.Child = _webView;
@@ -1248,6 +1254,7 @@ public partial class MainWindow : Window
         var preferencesWebView = new CompositionWebViewHost(new WebViewHostOptions
         {
             View = WebUiView.Preferences,
+            Language = ViewModel.UiLanguageEffective,
             RuntimeConfiguration = WebViewRuntimeConfiguration.Evergreen,
         });
         var formsHost = new System.Windows.Forms.Integration.WindowsFormsHost
@@ -1256,7 +1263,7 @@ public partial class MainWindow : Window
         };
         var window = new Window
         {
-            Title = "SOLIDWORKS 文件检索设置",
+            Title = AppUiText.Get(ViewModel.UiLanguageEffective, "window.settingsTitle"),
             Owner = this,
             Width = 760,
             Height = 620,
@@ -1400,7 +1407,7 @@ public partial class MainWindow : Window
     private void WebViewOnMessageRejected(object? sender, WebMessageRejectedEventArgs e)
     {
         AppWebUiDiagnostics.RecordRejection(e);
-        ViewModel.ReportFileActionFailure($"界面请求被拒绝：{e.Reason}");
+                ViewModel.ReportFileActionFailure(AppUiText.F(ViewModel.UiLanguageEffective, "ui.requestRejected", e.Reason));
     }
 
     private async void MainWindow_OnClosing(object? sender, CancelEventArgs e)

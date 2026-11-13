@@ -1,6 +1,10 @@
-# SOLIDWORKS 文件检索 v1.3.13（RC88）
+# SOLIDWORKS 文件检索 v1.3.18（RC94）
 
-Windows x64 中文桌面检索工具，仅处理 `.SLDPRT` 和 `.SLDASM`。Broker 持有 SQLite schema、文件发现、Everything 集成和 Metadata Worker；主程序的交互搜索与任务窗格、属性查看器一样是 Broker 的客户端，但搜索结果页通过 `SwSearch.Integration` 的只读回退直接读本地 SQLite 缓存（每次查询独立开只读连接、不池化，保证侧车可跨进程重建），管道仅承载进度/状态/刷新等控制消息。
+Windows x64 桌面检索工具，仅处理 `.SLDPRT` 和 `.SLDASM`。Broker 持有 SQLite schema、文件发现、Everything 集成和 Metadata Worker；主程序的交互搜索与任务窗格、属性查看器一样是 Broker 的客户端，但搜索结果页通过 `SwSearch.Integration` 的只读回退直接读本地 SQLite 缓存（每次查询独立开只读连接、不池化，保证侧车可跨进程重建），管道仅承载进度/状态/刷新等控制消息。
+
+## 多语言（RC94 新增）
+
+设置窗口新增「语言」下拉选项：**跟随系统**（默认）+ 简体中文 / English / 日本語 / Deutsch / Français / Español。保存后立即生效、无需重启；系统语言不在列表内时回退 English。覆盖全部用户界面（设置窗口、主工具栏、任务窗格、属性查看器、托盘菜单及宿主推送的状态文本）；控制台/日志/诊断与 OS 层注册项（右键菜单 MUIVerb）保持中文。实现细节见 [docs/LOCALIZATION.md](docs/LOCALIZATION.md)。SOLIDWORKS 任务窗格的语言在下一次打开任务窗格或重启 SOLIDWORKS 后生效。
 
 ## 核心行为
 
@@ -26,7 +30,7 @@ powershell -ExecutionPolicy Bypass -File .\installer\Build-Release.ps1
 
 正式候选必须使用 `installer\Build-Release.ps1` 一次性生成；该入口在 MSI 生成后以 SHA256、文件集合和 UTC 时间戳复验所有受控源码、测试、安装脚本与项目文件。
 
-当前代码为 RC75 候选前审计状态；`artifacts\SwSearch-x64-v1.3.9-rc75.msi` 尚未生成。RC1 至 RC74 均已退役并仅保留追溯；历史固定 MSI 不得覆盖。构建与静态验收不启动 SwSearch GUI、SOLIDWORKS、Everything、Explorer、安装器或 `msiexec`，不修改真实注册表、用户配置或 `%LOCALAPPDATA%\SwSearch`。
+当前代码为 RC94 候选状态（v1.3.18：多语言语言下拉选项；rc93 为同版本未安装中间轮）。RC1 起的候选均仅保留追溯；历史固定 MSI 不得覆盖。构建与静态验收不启动 SwSearch GUI、SOLIDWORKS、Everything、Explorer、安装器或 `msiexec`，不修改真实注册表、用户配置或 `%LOCALAPPDATA%\SwSearch`。
 
 ## 尚未完成
 

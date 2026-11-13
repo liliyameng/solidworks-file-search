@@ -21,8 +21,6 @@ public sealed class Rc20WebUiPreferencesContractTests
             folderMenu = false,
             filePropertiesMenu = true,
             startup = true,
-            propertyCardSource = "automatic",
-            propertyCardPath = "",
         });
         AssertAccepted(router, "preferences.save", new
         {
@@ -30,13 +28,14 @@ public sealed class Rc20WebUiPreferencesContractTests
             folderMenu = true,
             filePropertiesMenu = false,
             startup = false,
-            propertyCardSource = "custom",
-            propertyCardPath = @"C:\坚果云\SWPropertyEditor\Data\plm-config.xlsx",
+            language = "en",
         });
 
         AssertRejected(router, "settings", new { });
         AssertRejected(router, "settings.save", new { });
         AssertRejected(router, "settings.close", new { });
+        // Property-card fields stopped travelling through preferences.save;
+        // any legacy card field remains unauthorized.
         AssertRejected(router, "preferences.save", new
         {
             taskpane = true,
@@ -44,7 +43,6 @@ public sealed class Rc20WebUiPreferencesContractTests
             filePropertiesMenu = true,
             startup = true,
             propertyCardSource = "custom",
-            propertyCardPath = "",
         });
         AssertRejected(router, "preferences.save", new
         {
@@ -52,8 +50,7 @@ public sealed class Rc20WebUiPreferencesContractTests
             folderMenu = true,
             filePropertiesMenu = true,
             startup = true,
-            propertyCardSource = "custom",
-            propertyCardPath = @"C:\坚果云\config.txt",
+            language = "klingon",
         });
     }
 
@@ -70,7 +67,8 @@ public sealed class Rc20WebUiPreferencesContractTests
         StringAssert.Contains(js, "post(\"preferences.save\"");
         StringAssert.Contains(js, "Object.hasOwn(message.payload, \"preferences\")");
         StringAssert.Contains(js, "column.id !== \"fullPath\"");
-        StringAssert.Contains(js, "[\"copyPath\", \"复制完整路径\"]");
+        // RC93 i18n: context-menu labels resolve through the shared lang tables.
+        StringAssert.Contains(js, "[\"copyPath\", t(\"ctx.copyPath\")]");
         StringAssert.Contains(js, "path: result.fullPath");
         StringAssert.Contains(css, ".preferences-modal[hidden]");
         Assert.IsFalse(js.Contains("renderSettingsShell", StringComparison.Ordinal));

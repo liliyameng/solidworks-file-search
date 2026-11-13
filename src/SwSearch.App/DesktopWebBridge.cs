@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Text.Json;
 using SwSearch.Contracts;
+using SwSearch.WebUi;
 using SwSearch.WebUi.Security;
 
 namespace SwSearch.App;
@@ -260,6 +261,7 @@ internal sealed class DesktopWebBridge : IDisposable
             totalResultCount = clientResultCount,
             resultSummary = _viewModel.ResultSummary,
             status = _viewModel.StatusText,
+            language = _viewModel.UiLanguageEffective,
             runtime = _viewModel.RuntimeSummary,
             indexProgress = new
             {
@@ -277,14 +279,14 @@ internal sealed class DesktopWebBridge : IDisposable
             resultSetId = _viewModel.CurrentResultSetId,
             resultRevision = _viewModel.CurrentPageRevision,
             resultStart = _viewModel.ResultBaseOffset,
-            results = resultBatch.Select(static item => new
+            results = resultBatch.Select(item => new
             {
                 fullPath = item.FullPath,
                 fileName = item.FileName,
-                kind = item.KindLabel,
-                matchedProperty = item.MatchedPropertyLabel,
+                kind = KindLabelFor(item),
+                matchedProperty = item.Hit.MatchedProperty ?? T("hit.filename"),
                 matchedValue = item.MatchedValueLabel,
-                source = item.SourceLabel,
+                source = SourceLabelFor(item),
                 directory = item.DirectoryPath,
             }).ToArray(),
             performance = _completedSearchPerformance is { } timing ? new
@@ -320,9 +322,9 @@ internal sealed class DesktopWebBridge : IDisposable
             isOpen = true,
             busy = true,
             error = (string?)null,
-            status = "正在读取偏好设置…",
+            status = T("prefs.readingBridge"),
         });
-        _ = LoadPreferencesAsync(operation.Generation, operation.Token, "偏好设置已加载。");
+        _ = LoadPreferencesAsync(operation.Generation, operation.Token, T("prefs.loadedBridge"));
     }
 
     private void ClosePreferences()
@@ -357,7 +359,7 @@ internal sealed class DesktopWebBridge : IDisposable
             isOpen = true,
             busy = true,
             error = (string?)null,
-            status = "正在保存偏好设置…",
+            status = T("prefs.savingBridge"),
         });
         _ = SavePreferencesAsync(request, operation.Generation, operation.Token);
     }
@@ -376,9 +378,13 @@ internal sealed class DesktopWebBridge : IDisposable
             }
             if (saveResult.PreferencesSaved)
             {
+                _viewModel.UpdateLanguageInMemory(saveResult.NormalizedRequest.Language);
                 var persisted = _viewModel.UpdatePropertyDisplayOrderInMemory(
                     saveResult.NormalizedRequest.PropertyDisplayOrder);
                 _viewModel.ApplyPersistedSettings(persisted);
+                // Push the new language (plus refreshed status/summary text) to
+                // the main toolbar WebView so it re-renders without a restart.
+                PublishState();
             }
             var snapshot = await _preferencesRepository.LoadAsync(cancellationToken);
             if (!IsCurrentPreferencesOperation(generation, cancellationToken))
@@ -394,10 +400,10 @@ internal sealed class DesktopWebBridge : IDisposable
                     ? snapshot.ConfigurationError
                     : string.Join("；", failedIntegrations.Select(static result => result.Message));
             var status = !saveResult.PreferencesSaved
-                ? "本地偏好未保存；请按具体原因处理后重试。"
+                ? T("prefs.saveFailedBridge")
                 : failedIntegrations.Length == 0
-                    ? "偏好设置已保存。"
-                    : "本地偏好已保存；部分系统集成未完成。";
+                    ? T("prefs.savedBridge")
+                    : T("prefs.savedPartialBridge");
             PublishPreferencesSnapshot(snapshot, status, error, saveResult);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -425,7 +431,7 @@ internal sealed class DesktopWebBridge : IDisposable
                 snapshot,
                 snapshot.ConfigurationError is null
                     ? successStatus
-                    : "部分配置需要修正；面板仍可继续使用。",
+                    : T("prefs.needsFixBridge"),
                 snapshot.ConfigurationError);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -454,6 +460,7 @@ internal sealed class DesktopWebBridge : IDisposable
             filePropertiesMenu = snapshot.FilePropertiesMenu?.IsEnabled ?? false,
             startup = snapshot.Startup.IsEnabled,
             propertyDisplayOrder = snapshot.PropertyDisplayOrder ?? Array.Empty<string>(),
+            language = snapshot.Language,
             integrations = new
             {
                 taskpane = IntegrationPayload(snapshot.Taskpane),
@@ -491,7 +498,7 @@ internal sealed class DesktopWebBridge : IDisposable
             isOpen = true,
             busy = false,
             error = DescribePreferencesError(exception),
-            status = "偏好设置操作失败；主搜索仍可正常使用。",
+            status = T("prefs.failedBridge"),
         });
     }
 
@@ -516,7 +523,7 @@ internal sealed class DesktopWebBridge : IDisposable
         requiresSolidWorksRestart = state.RequiresSolidWorksRestart,
     };
 
-    private static object? SaveResultsPayload(UserPreferencesSaveResult? result)
+    private object? SaveResultsPayload(UserPreferencesSaveResult? result)
     {
         if (result is null)
         {
@@ -526,7 +533,7 @@ internal sealed class DesktopWebBridge : IDisposable
         {
             var item = result.Integrations.FirstOrDefault(candidate => candidate.Target == target);
             return item is null
-                ? new { attempted = false, succeeded = false, message = "未执行。" }
+                ? new { attempted = false, succeeded = false, message = T("prefs.notAttempted") }
                 : new
                 {
                     attempted = true,
@@ -540,7 +547,7 @@ internal sealed class DesktopWebBridge : IDisposable
             persistence = new
             {
                 succeeded = result.PreferencesSaved,
-                message = result.PersistenceError ?? "本地偏好已原子保存。",
+                message = result.PersistenceError ?? T("prefs.atomicSaved"),
             },
             taskpane = Item(UserPreferenceIntegrationTarget.Taskpane),
             folderMenu = Item(UserPreferenceIntegrationTarget.FolderMenu),
@@ -549,14 +556,14 @@ internal sealed class DesktopWebBridge : IDisposable
         };
     }
 
-    private static string DescribePreferencesError(Exception exception) => exception switch
+    private string DescribePreferencesError(Exception exception) => exception switch
     {
-        TimeoutException => "操作超时，请关闭面板后重试。",
-        UnauthorizedAccessException => "当前用户没有修改该项设置的权限。",
+        TimeoutException => T("prefs.error.timeout"),
+        UnauthorizedAccessException => T("prefs.error.unauthorized"),
         InvalidDataException => exception.Message,
         ArgumentException => exception.Message,
-        IOException => "设置文件暂时无法读写，请稍后重试。",
-        _ => "偏好设置未能完成操作，请检查输入后重试。",
+        IOException => T("prefs.error.io"),
+        _ => T("prefs.error.generic"),
     };
 
     public async Task FlushColumnPersistenceAsync(TimeSpan timeout)
@@ -583,7 +590,7 @@ internal sealed class DesktopWebBridge : IDisposable
     {
         if (!ResultActionProtocol.TryParse(payload, out var request, out _))
         {
-            _viewModel.ReportFileActionFailure("结果操作命令无效。");
+            _viewModel.ReportFileActionFailure(T("result.invalidCommand"));
             return;
         }
         switch (request.Action)
@@ -607,14 +614,14 @@ internal sealed class DesktopWebBridge : IDisposable
     {
         if (!FileDragProtocol.TryParse(payload, out var request, out _))
         {
-            _viewModel.ReportFileActionFailure("结果路径无效，请重新选择。");
+            _viewModel.ReportFileActionFailure(T("result.invalidPath"));
             return;
         }
 
         if (request.ResultSetId != _viewModel.CurrentResultSetId ||
             request.ResultRevision != _viewModel.CurrentPageRevision)
         {
-            _viewModel.ReportFileActionFailure("结果已刷新，请重新拖动当前行。");
+            _viewModel.ReportFileActionFailure(T("result.staleDrag"));
             return;
         }
 
@@ -625,20 +632,20 @@ internal sealed class DesktopWebBridge : IDisposable
             string.Equals(item.FullPath, request.Path, StringComparison.OrdinalIgnoreCase));
         if (result is null)
         {
-            _viewModel.ReportFileActionFailure("该结果已刷新或不再可用，请重新选择当前行。");
+            _viewModel.ReportFileActionFailure(T("result.staleRow"));
             return;
         }
 
         if (!WebMessageValidators.IsSafeSolidWorksPath(result.FullPath))
         {
-            _viewModel.ReportFileActionFailure("该结果不是可拖放的 SOLIDWORKS 零件或装配体。");
+            _viewModel.ReportFileActionFailure(T("result.notSolidWorks"));
             return;
         }
 
         var arm = FileDragArmed;
         if (arm is null)
         {
-            _viewModel.ReportFileActionFailure("文件拖放暂不可用，请稍后重试。");
+            _viewModel.ReportFileActionFailure(T("result.dragUnavailable"));
             return;
         }
 
@@ -794,6 +801,31 @@ internal sealed class DesktopWebBridge : IDisposable
         }
     }
 
+    private string T(string key) => AppUiText.Get(_viewModel.UiLanguageEffective, key);
+
+    private string KindLabelFor(SearchResultItem item) => item.Hit.Kind switch
+    {
+        SolidWorksDocumentKind.Part => T("kind.part"),
+        SolidWorksDocumentKind.Assembly => T("kind.assembly"),
+        _ => T("kind.unknown"),
+    };
+
+    private string SourceLabelFor(SearchResultItem item)
+    {
+        var hit = item.Hit;
+        if (hit.OriginModelPath is null)
+        {
+            return T(hit.MatchedProperty is null ? "source.file" : "source.currentDocument");
+        }
+        var label = AppUiText.F(
+            _viewModel.UiLanguageEffective,
+            "source.relatedModel",
+            Path.GetFileName(hit.OriginModelPath));
+        return string.IsNullOrWhiteSpace(hit.OriginConfiguration)
+            ? label
+            : label + " · " + hit.OriginConfiguration;
+    }
+
     private object[] CreateFixedColumns()
     {
         var widths = _viewModel.ColumnLayouts.ToDictionary(static item => item.Id, static item => item.Width, StringComparer.Ordinal);
@@ -802,13 +834,19 @@ internal sealed class DesktopWebBridge : IDisposable
             .Select(column => (object)new
         {
             id = column.Id,
-            name = column.DisplayName,
+            name = ColumnNameFor(column.Id, column.DisplayName),
             width = widths.GetValueOrDefault(column.Id, column.Width),
         }).ToArray();
     }
 
+    private string ColumnNameFor(string columnId, string fallbackName)
+    {
+        var localized = AppUiText.Get(_viewModel.UiLanguageEffective, "column." + columnId);
+        return localized == "column." + columnId ? fallbackName : localized;
+    }
+
     private void RejectUnboundResultAction() =>
-        _viewModel.ReportFileActionFailure("结果操作缺少当前行标识，已拒绝执行。请重新选择当前行后重试。");
+        _viewModel.ReportFileActionFailure(T("result.missingIdentity"));
 
     private void WithCurrentResult(ResultActionRequest request, Func<SearchResultItem, bool> action)
     {
@@ -820,20 +858,20 @@ internal sealed class DesktopWebBridge : IDisposable
             request.ResultRevision != _viewModel.CurrentPageRevision ||
             request.ResultStart != _viewModel.ResultBaseOffset)
         {
-            _viewModel.ReportFileActionFailure("结果已刷新，无法确认当前文件。请重新选择当前行后重试。");
+            _viewModel.ReportFileActionFailure(T("result.staleConfirm"));
             return;
         }
 
         if ((uint)request.ResultIndex >= (uint)_viewModel.Results.Count)
         {
-            _viewModel.ReportFileActionFailure("该结果不在当前结果窗口中，请重新选择当前行。");
+            _viewModel.ReportFileActionFailure(T("result.outOfWindow"));
             return;
         }
 
         var result = _viewModel.Results[request.ResultIndex];
         if (!string.Equals(result.FullPath, request.Path, StringComparison.Ordinal))
         {
-            _viewModel.ReportFileActionFailure("结果路径与当前行不一致，已拒绝执行。请重新选择当前行。");
+            _viewModel.ReportFileActionFailure(T("result.pathMismatch"));
             return;
         }
 
@@ -918,6 +956,18 @@ internal sealed class DesktopWebBridge : IDisposable
         {
             return false;
         }
+        var language = UiLanguage.Auto;
+        if (payload.TryGetProperty("language", out var languageNode))
+        {
+            var rawLanguage = languageNode.ValueKind == JsonValueKind.String
+                ? languageNode.GetString()
+                : null;
+            if (string.IsNullOrEmpty(rawLanguage) || !UiLanguage.IsValidConfiguredValue(rawLanguage))
+            {
+                return false;
+            }
+            language = rawLanguage;
+        }
         request = new UserPreferencesSaveRequest(
             taskpane,
             folderMenu,
@@ -926,7 +976,8 @@ internal sealed class DesktopWebBridge : IDisposable
             string.Empty,
             Array.Empty<string>(),
             filePropertiesMenu,
-            propertyDisplayOrder);
+            propertyDisplayOrder,
+            language);
         return true;
     }
 

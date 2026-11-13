@@ -8,6 +8,11 @@
     <Resource Include="..\Assets\Brand\SwSearch.ico" Link="Assets\Brand\SwSearch.ico" />
   </ItemGroup>
   <ItemGroup>
+    <!-- Shared UI-language resolver, source-linked to avoid a project reference
+         from this viewer into the WebUi assembly. -->
+    <Compile Include="..\Shared\UiLanguage.cs" Link="UiLanguage.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\SwSearch.Contracts\SwSearch.Contracts.csproj" />
     <ProjectReference Include="..\SwSearch.Indexer\SwSearch.Indexer.csproj" />
   </ItemGroup>

@@ -300,7 +300,14 @@ if ($controlSource.Contains('MaximumBufferedResults') -or $controlSource.Contain
     throw 'Taskpane retains a product-level result cap.'
 }
 
-$tryParse = $bridgePolicy.GetMethod('TryParse', $binding)
+# RC93 added a language-aware TryParse overload; pin the original
+# (json, out command, out error) three-parameter contract explicitly.
+$tryParse = @($bridgePolicy.GetMethods($binding) | Where-Object {
+        $_.Name -ceq 'TryParse' -and $_.GetParameters().Count -eq 3
+    })[0]
+if ($null -eq $tryParse) {
+    throw 'Taskpane bridge TryParse(json, out command, out error) overload not found.'
+}
 $allowedTypesField = $bridgePolicy.GetField('AllowedTypes', $binding)
 $allowedTypes = @($allowedTypesField.GetValue($null) | ForEach-Object { [string]$_ } | Sort-Object)
 if ($allowedTypes.Count -ne 3 -or ($allowedTypes -join ',') -cne 'ready,retry,search') {

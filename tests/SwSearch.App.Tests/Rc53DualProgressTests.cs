@@ -253,7 +253,11 @@ public sealed class Rc53DualProgressTests
         Assert.IsTrue(start >= 0 && end > start);
         var body = script[start..end];
         StringAssert.Contains(script, "const formatProgressPercent = value => value == null ? \"--%\" : `${value.toFixed(2)}%`;");
-        StringAssert.Contains(body, "文件 ${formatProgressPercent(filePercent)} · 可读取缓存 ${formatProgressPercent(cachedCoveragePercent)} · 属性处理 ${formatProgressPercent(currentMetadataPercent)}");
+        // RC93 i18n: the label is composed from the localized index.label template.
+        StringAssert.Contains(body, "window.SW_FORMAT(t(\"index.label\")");
+        StringAssert.Contains(body, "formatProgressPercent(filePercent)");
+        StringAssert.Contains(body, "formatProgressPercent(cachedCoveragePercent)");
+        StringAssert.Contains(body, "formatProgressPercent(currentMetadataPercent)");
         StringAssert.Contains(body, "--index-progress-dark-end");
         Assert.IsFalse(body.Contains("progress.label", StringComparison.Ordinal));
         Assert.IsFalse(body.Contains("progress.tooltip", StringComparison.Ordinal));

@@ -6,6 +6,15 @@
   const view = document.documentElement.dataset.view || "main";
   const app = document.getElementById("app");
   const bridge = window.chrome && window.chrome.webview;
+  const initialLanguage = () => {
+    try {
+      const parameter = new URLSearchParams(window.location.search).get("lang");
+      if (parameter && window.SW_STRINGS && window.SW_STRINGS[parameter]) return parameter;
+    } catch (error) { /* query parameters are optional */ }
+    return (window.SW_STRINGS && window.SW_DEFAULT_LANG) || "zh-CN";
+  };
+  let language = initialLanguage();
+  const t = key => window.SW_T(language, key);
   let state = {};
   let selectedPath = "";
   let searchTimer = 0;
@@ -36,6 +45,14 @@
     bridge.postMessage(message);
   };
 
+  function applyDocumentLanguage() {
+    document.documentElement.lang = language;
+    document.title = t(view === "preferences" ? "title.preferences"
+      : view === "property" ? "title.property"
+      : view === "taskpane" ? "title.taskpane"
+      : "title.search");
+  }
+
   const text = value => value == null ? "" : String(value);
   const formatProgressPercent = value => value == null ? "--%" : `${value.toFixed(2)}%`;
   const escapeText = value => text(value).replace(/[&<>"']/g, character => ({
@@ -45,6 +62,7 @@
   const searchViews = new Set(["main", "maintoolbar", "taskpane"]);
   const isDesktopSearchView = view === "main" || view === "maintoolbar";
   const supportsPreferences = view === "main" || view === "preferences";
+  applyDocumentLanguage();
   if (view === "preferences") renderPreferencesShell();
   else if (searchViews.has(view)) renderSearchShell();
   else renderPropertyShell();
@@ -59,6 +77,8 @@
         !message.payload || typeof message.payload !== "object") return;
     if (message.type === "state") {
       const payload = { ...message.payload };
+      const nextLanguage = typeof payload.language === "string" &&
+        window.SW_STRINGS && window.SW_STRINGS[payload.language] ? payload.language : "";
       if (searchViews.has(view) && Array.isArray(payload.results)) {
         const batch = payload.results;
         const start = Number.isInteger(payload.resultStart) ? payload.resultStart : 0;
@@ -91,6 +111,13 @@
       if (view === "main" && Number.isInteger(payload.resultBaseOffset) &&
           payload.resultBaseOffset === requestedWindowOffset) requestedWindowOffset = -1;
       state = { ...state, ...payload };
+      if (nextLanguage && nextLanguage !== language) {
+        language = nextLanguage;
+        applyDocumentLanguage();
+        if (view === "preferences") renderPreferencesShell();
+        else if (searchViews.has(view)) renderSearchShell();
+        else renderPropertyShell();
+      }
       if (searchViews.has(view)) {
         if (view === "main" && payload.resultsMode === "none") updateSearchStatusState();
         else updateSearchState();
@@ -117,14 +144,14 @@
 
     app.innerHTML = `<section class="shell">
       <div class="toolbar">
-        <span class="search-wrap"><span id="scopeToken" class="scope-token" hidden><span id="scopePath"></span><button id="clearScope" type="button" title="退出文件夹范围" aria-label="退出文件夹范围">×</button></span><input id="search" class="search" type="search" autocomplete="off" spellcheck="false" aria-label="搜索 SOLIDWORKS 文件" placeholder="键入文件名或属性，立即搜索"></span>
+        <span class="search-wrap"><span id="scopeToken" class="scope-token" hidden><span id="scopePath"></span><button id="clearScope" type="button" title="${escapeText(t("scope.exit"))}" aria-label="${escapeText(t("scope.exit"))}">×</button></span><input id="search" class="search" type="search" autocomplete="off" spellcheck="false" aria-label="${escapeText(t("search.aria"))}" placeholder="${escapeText(t("search.placeholder"))}"></span>
         ${view === "taskpane"
-          ? '<span id="modeButton" class="mode mode-fixed" role="status" aria-label="搜索模式：文件库">文件库</span>'
+          ? `<span id="modeButton" class="mode mode-fixed" role="status" aria-label="${escapeText(t("mode.fixed.aria"))}">${escapeText(t("mode.library"))}</span>`
           : desktopModeButtonsMarkup()}
-        <button id="retry" hidden>重试</button>
-        <button id="settings" title="设置" aria-label="设置">⚙</button>
+        <button id="retry" hidden>${escapeText(t("retry"))}</button>
+        <button id="settings" title="${escapeText(t("settings"))}" aria-label="${escapeText(t("settings"))}">⚙</button>
       </div>
-      ${view === "taskpane" ? "" : '<div id="results" class="results" tabindex="0" aria-label="搜索结果"><div id="grid" class="grid"><div id="header" class="header"></div><div id="rows" class="rows"></div></div></div><div class="statusbar"><span id="status">正在搜索…</span><div id="indexProgress" class="index-progress" role="progressbar" aria-label="索引建立进度" aria-valuemin="0" aria-valuemax="100" aria-valuetext="文件 --% · 可读取缓存 --% · 属性处理 --%"><span class="index-progress-track" aria-hidden="true"><span id="fileProgressFill" class="index-progress-fill file"></span><span id="cachedCoverageProgressFill" class="index-progress-fill cached-coverage"></span><span id="currentMetadataProgressFill" class="index-progress-fill current-metadata"></span></span><span class="index-progress-label-layer" aria-hidden="true"><span id="indexProgressLabel" class="index-progress-label">文件 --% · 可读取缓存 --% · 属性处理 --%</span><span id="indexProgressLabelOnDark" class="index-progress-label on-dark">文件 --% · 可读取缓存 --% · 属性处理 --%</span></span></div><span class="status-meta"><span id="version"></span><span id="summary"></span></span></div>'}
+      ${view === "taskpane" ? "" : `<div id="results" class="results" tabindex="0" aria-label="${escapeText(t("results.aria"))}"><div id="grid" class="grid"><div id="header" class="header"></div><div id="rows" class="rows"></div></div></div><div class="statusbar"><span id="status">${escapeText(t("status.searching"))}</span><div id="indexProgress" class="index-progress" role="progressbar" aria-label="${escapeText(t("index.aria"))}" aria-valuemin="0" aria-valuemax="100" aria-valuetext="${escapeText(window.SW_FORMAT(t("index.label"), "--%", "--%", "--%"))}"><span class="index-progress-track" aria-hidden="true"><span id="fileProgressFill" class="index-progress-fill file"></span><span id="cachedCoverageProgressFill" class="index-progress-fill cached-coverage"></span><span id="currentMetadataProgressFill" class="index-progress-fill current-metadata"></span></span><span class="index-progress-label-layer" aria-hidden="true"><span id="indexProgressLabel" class="index-progress-label">${escapeText(window.SW_FORMAT(t("index.label"), "--%", "--%", "--%"))}</span><span id="indexProgressLabelOnDark" class="index-progress-label on-dark">${escapeText(window.SW_FORMAT(t("index.label"), "--%", "--%", "--%"))}</span></span></div><span class="status-meta"><span id="version"></span><span id="summary"></span></span></div>`}
     </section>
     <div id="preferencesModal" class="preferences-modal" role="dialog" aria-modal="true" aria-labelledby="preferencesTitle" hidden>${preferencesPanelMarkup()}</div>`;
 
@@ -174,24 +201,36 @@
   // Keep the form markup in one place.  The desktop host opens this same
   // form in a standalone WebView window, while the legacy full-page shell
   // still uses it in a modal.
+  // Language endonyms stay fixed across locales; only "auto" is translated.
+  function languageOptionsMarkup() {
+    const options = [`<option value="auto">${escapeText(t("prefs.language.auto"))}</option>`];
+    (window.SW_LANG_OPTIONS || []).forEach(option => {
+      options.push(`<option value="${escapeText(option.value)}">${escapeText(option.label)}</option>`);
+    });
+    return options.join("");
+  }
+
   function preferencesPanelMarkup() {
     return `<section class="preferences-panel">
-      <header class="preferences-header"><h1 id="preferencesTitle">设置</h1><button id="closePreferences" class="icon-button" type="button" aria-label="关闭设置">×</button></header>
+      <header class="preferences-header"><h1 id="preferencesTitle">${escapeText(t("prefs.title"))}</h1><button id="closePreferences" class="icon-button" type="button" aria-label="${escapeText(t("prefs.close"))}">×</button></header>
       <div class="preferences-body">
-        <section class="preferences-card"><h2>Windows 与 SOLIDWORKS 集成</h2>
-          <label class="toggle-row"><span><strong>SOLIDWORKS 右侧任务窗格</strong><small>启用或关闭 SOLIDWORKS 中的搜索任务窗格。</small></span><input id="preferenceTaskpane" class="switch" type="checkbox"></label>
-          <label class="toggle-row"><span><strong>Windows 11 一级文件夹右键搜索</strong><small>注册或注销文件夹一级右键菜单中的搜索入口。</small></span><input id="preferenceFolderMenu" class="switch" type="checkbox"></label>
-          <label class="toggle-row"><span><strong>文件右键显示“查看 SOLIDWORKS 属性”</strong><small>仅在 .SLDPRT、.SLDASM 文件的 Windows 11 一级菜单中显示。</small></span><input id="preferenceFilePropertiesMenu" class="switch" type="checkbox"></label>
-          <label class="toggle-row"><span><strong>开机自启</strong><small>登录 Windows 后自动启动搜索服务。</small></span><input id="preferenceStartup" class="switch" type="checkbox"></label>
+        <section class="preferences-card"><h2>${escapeText(t("prefs.language.title"))}</h2>
+          <label class="toggle-row" for="preferenceLanguage"><span><strong>${escapeText(t("prefs.language.label"))}</strong><small>${escapeText(t("prefs.language.hint"))}</small></span><select id="preferenceLanguage" class="preference-select">${languageOptionsMarkup()}</select></label>
         </section>
-        <section class="preferences-card"><h2>属性显示顺序</h2>
-          <label for="preferencePropertyDisplayOrder">优先显示的属性（每行一个）</label>
+        <section class="preferences-card"><h2>${escapeText(t("prefs.card.integration"))}</h2>
+          <label class="toggle-row"><span><strong>${escapeText(t("prefs.taskpane.title"))}</strong><small>${escapeText(t("prefs.taskpane.desc"))}</small></span><input id="preferenceTaskpane" class="switch" type="checkbox"></label>
+          <label class="toggle-row"><span><strong>${escapeText(t("prefs.folderMenu.title"))}</strong><small>${escapeText(t("prefs.folderMenu.desc"))}</small></span><input id="preferenceFolderMenu" class="switch" type="checkbox"></label>
+          <label class="toggle-row"><span><strong>${escapeText(t("prefs.fileProps.title"))}</strong><small>${escapeText(t("prefs.fileProps.desc"))}</small></span><input id="preferenceFilePropertiesMenu" class="switch" type="checkbox"></label>
+          <label class="toggle-row"><span><strong>${escapeText(t("prefs.startup.title"))}</strong><small>${escapeText(t("prefs.startup.desc"))}</small></span><input id="preferenceStartup" class="switch" type="checkbox"></label>
+        </section>
+        <section class="preferences-card"><h2>${escapeText(t("prefs.order.title"))}</h2>
+          <label for="preferencePropertyDisplayOrder">${escapeText(t("prefs.order.label"))}</label>
           <textarea id="preferencePropertyDisplayOrder" rows="6" spellcheck="false" placeholder="图号&#10;名称&#10;材料名称"></textarea>
-          <p class="hint">属性查看器会按此顺序优先排列命中的属性；未列出的其他属性排在后面。</p>
+          <p class="hint">${escapeText(t("prefs.order.hint"))}</p>
         </section>
         <p id="preferencesStatus" class="preferences-status" role="status" aria-live="polite"></p>
       </div>
-      <footer class="preferences-actions"><button id="cancelPreferences" type="button">取消</button><button id="savePreferences" class="primary" type="button">保存</button></footer>
+      <footer class="preferences-actions"><button id="cancelPreferences" type="button">${escapeText(t("prefs.cancel"))}</button><button id="savePreferences" class="primary" type="button">${escapeText(t("prefs.save"))}</button></footer>
     </section>`;
   }
 
@@ -199,7 +238,7 @@
     document.getElementById("closePreferences")?.addEventListener("click", closePreferences);
     document.getElementById("cancelPreferences")?.addEventListener("click", closePreferences);
     document.getElementById("savePreferences")?.addEventListener("click", savePreferences);
-    document.querySelectorAll(".preferences-panel input, .preferences-panel textarea").forEach(input => input.addEventListener("input", () => {
+    document.querySelectorAll(".preferences-panel input, .preferences-panel textarea, .preferences-panel select").forEach(input => input.addEventListener("input", () => {
       preferencesDirty = true;
     }));
     document.addEventListener("keydown", event => {
@@ -213,7 +252,7 @@
     preferencesOpen = true;
     preferencesDirty = false;
     preferencesSaving = false;
-    document.getElementById("preferencesStatus").textContent = "正在读取设置…";
+    document.getElementById("preferencesStatus").textContent = t("prefs.status.loading");
     updatePreferencesState(state.preferences);
     post("preferences.open", {});
     setTimeout(() => document.getElementById("closePreferences")?.focus(), 0);
@@ -226,10 +265,10 @@
   function renderMainToolbarShell() {
     app.innerHTML = `<section class="shell">
       <div class="toolbar">
-        <span class="search-wrap"><span id="scopeToken" class="scope-token" hidden><span id="scopePath"></span><button id="clearScope" type="button" title="退出文件夹范围" aria-label="退出文件夹范围">×</button></span><input id="search" class="search" type="search" autocomplete="off" spellcheck="false" aria-label="搜索 SOLIDWORKS 文件" placeholder="输入文件名或属性，立即搜索"></span>
+        <span class="search-wrap"><span id="scopeToken" class="scope-token" hidden><span id="scopePath"></span><button id="clearScope" type="button" title="${escapeText(t("scope.exit"))}" aria-label="${escapeText(t("scope.exit"))}">×</button></span><input id="search" class="search" type="search" autocomplete="off" spellcheck="false" aria-label="${escapeText(t("search.aria"))}" placeholder="${escapeText(t("search.placeholder.toolbar"))}"></span>
         ${desktopModeButtonsMarkup()}
-        <button id="retry" hidden>重试</button>
-        <button id="settings" title="设置" aria-label="设置">⚙</button>
+        <button id="retry" hidden>${escapeText(t("retry"))}</button>
+        <button id="settings" title="${escapeText(t("settings"))}" aria-label="${escapeText(t("settings"))}">⚙</button>
       </div>
     </section>`;
 
@@ -276,7 +315,7 @@
   }
 
   function desktopModeButtonsMarkup() {
-    return '<span id="modeGroup" class="mode-group" role="group" aria-label="搜索方式"><button type="button" data-mode="all" aria-pressed="true">全部</button><button type="button" data-mode="name" aria-pressed="false">文件名</button><button type="button" data-mode="property" aria-pressed="false">属性</button></span>';
+    return `<span id="modeGroup" class="mode-group" role="group" aria-label="${escapeText(t("mode.group"))}"><button type="button" data-mode="all" aria-pressed="true">${escapeText(t("mode.all"))}</button><button type="button" data-mode="name" aria-pressed="false">${escapeText(t("mode.name"))}</button><button type="button" data-mode="property" aria-pressed="false">${escapeText(t("mode.property"))}</button></span>`;
   }
 
   function bindDesktopModeButtons() {
@@ -315,11 +354,11 @@
       ["folder", "library"].includes(state.scope.kind) &&
       typeof state.scope.rootPath === "string" && state.scope.rootPath.trim().length > 0;
     scopeToken.hidden = !visibleScope;
-    scopePath.textContent = visibleScope ? `${state.scope.kind === "library" ? "文件库 · " : ""}${state.scope.rootPath}` : "";
+    scopePath.textContent = visibleScope ? `${state.scope.kind === "library" ? t("scope.library.prefix") : ""}${state.scope.rootPath}` : "";
     scopeToken.title = visibleScope ? state.scope.rootPath : "";
     const allowedModes = ["all", "name", "property"];
     const mode = view === "taskpane" ? "library" : (allowedModes.includes(state.mode) ? state.mode : "all");
-    const labels = { all: "全部", name: "文件名", property: "属性", library: "文件库" };
+    const labels = { all: t("mode.all"), name: t("mode.name"), property: t("mode.property"), library: t("mode.library") };
     if (view === "taskpane") document.getElementById("modeButton").textContent = labels[mode];
     else updateDesktopModeButtons(mode);
     updateSearchStatusState();
@@ -347,7 +386,7 @@
     const status = document.getElementById("status");
     const summary = document.getElementById("summary");
     const version = document.getElementById("version");
-    if (status) status.textContent = state.status || (state.busy ? "正在搜索…" : "");
+    if (status) status.textContent = state.status || (state.busy ? t("status.searching") : "");
     if (summary) summary.textContent = text(state.resultSummary || "");
     if (version) version.textContent = state.version ? `v${state.version}` : "";
     if (isDesktopSearchView) updateQueryProgress();
@@ -415,7 +454,10 @@
     root.classList.toggle("cached-coverage-unknown", cachedCoveragePercent == null);
     root.classList.toggle("current-metadata-unknown", currentMetadataPercent == null);
     root.style.setProperty("--index-progress-dark-end", `${currentMetadataPercent == null ? 0 : currentMetadataPercent}%`);
-    const progressLabel = `文件 ${formatProgressPercent(filePercent)} · 可读取缓存 ${formatProgressPercent(cachedCoveragePercent)} · 属性处理 ${formatProgressPercent(currentMetadataPercent)}`;
+    const progressLabel = window.SW_FORMAT(t("index.label"),
+      formatProgressPercent(filePercent),
+      formatProgressPercent(cachedCoveragePercent),
+      formatProgressPercent(currentMetadataPercent));
     label.textContent = progressLabel;
     labelOnDark.textContent = progressLabel;
     root.title = progressLabel;
@@ -424,9 +466,9 @@
 
   function defaultColumns() {
     const columns = [
-      { id: "fileName", name: "文件名", width: 230 }, { id: "kind", name: "类型", width: 80 },
-      { id: "matchedProperty", name: "匹配属性", width: 130 }, { id: "matchedValue", name: "匹配值", width: 170 },
-      { id: "source", name: "来源", width: 95 }, { id: "directory", name: "所在文件夹", width: 310 }
+      { id: "fileName", name: t("column.fileName"), width: 230 }, { id: "kind", name: t("column.kind"), width: 80 },
+      { id: "matchedProperty", name: t("column.matchedProperty"), width: 130 }, { id: "matchedValue", name: t("column.matchedValue"), width: 170 },
+      { id: "source", name: t("column.source"), width: 95 }, { id: "directory", name: t("column.directory"), width: 310 }
     ];
     return view === "taskpane" ? columns.filter(column => !["source", "directory"].includes(column.id)) : columns;
   }
@@ -652,7 +694,7 @@
   function postResultAction(action, result, resultIndex) {
     const path = result && typeof result.fullPath === "string" ? result.fullPath : "";
     if (!path) {
-      showContextActionFeedback("结果路径不可用，请重新选择。", true);
+      showContextActionFeedback(t("feedback.pathUnavailable"), true);
       return;
     }
     if (view !== "main") {
@@ -662,7 +704,7 @@
     }
     const reference = createDesktopResultReference(result, resultIndex);
     if (!reference) {
-      showContextActionFeedback("当前结果已刷新，请重新选择后重试。", true);
+      showContextActionFeedback(t("feedback.staleReference"), true);
       return;
     }
     post("contextAction", { ...reference, action });
@@ -671,17 +713,17 @@
   function showContextMenu(event, result, resultIndex) {
     event.preventDefault(); event.stopPropagation(); dismissContextMenu();
     const rowPath = result && typeof result.fullPath === "string" ? result.fullPath : "";
-    if (!rowPath) { showContextActionFeedback("结果路径不可用，请重新选择。", true); return; }
+    if (!rowPath) { showContextActionFeedback(t("feedback.pathUnavailable"), true); return; }
     const desktopReference = view === "main" ? createDesktopResultReference(result, resultIndex) : null;
     if (view === "main" && !desktopReference) {
-      showContextActionFeedback("当前结果已刷新，请重新选择后重试。", true);
+      showContextActionFeedback(t("feedback.staleReference"), true);
       return;
     }
     selectedPath = rowPath;
     const menu = document.createElement("div");
     menu.className = "context-menu";
     menu.dataset.path = rowPath;
-    const actions = [["open", "打开"], ["reveal", "在文件夹中定位"], ["copyPath", "复制完整路径"], ["viewProperties", "查看 SOLIDWORKS 属性"]];
+    const actions = [["open", t("ctx.open")], ["reveal", t("ctx.reveal")], ["copyPath", t("ctx.copyPath")], ["viewProperties", t("ctx.viewProperties")]];
     actions
       .forEach(([action, label]) => {
       const button = document.createElement("button");
@@ -701,7 +743,7 @@
       if (desktopReference) post("contextAction", { ...desktopReference, action });
       else post("contextAction", { schema: 1, action, path });
       dismissContextMenu();
-      showContextActionFeedback(action === "copyPath" ? "正在复制完整路径…" : "正在执行…", false);
+      showContextActionFeedback(action === "copyPath" ? t("feedback.copying") : t("feedback.running"), false);
     });
     document.body.append(menu);
     const bounds = menu.getBoundingClientRect();
@@ -746,7 +788,7 @@
     preferencesSaving = false;
     const modal = document.getElementById("preferencesModal");
     if (modal) modal.hidden = false;
-    document.getElementById("preferencesStatus").textContent = "正在读取设置…";
+    document.getElementById("preferencesStatus").textContent = t("prefs.status.loading");
     updatePreferencesState(state.preferences);
     post("preferences.open", {});
     setTimeout(() => document.getElementById("closePreferences")?.focus(), 0);
@@ -768,7 +810,7 @@
 
     preferencesDirty = false;
     preferencesSaving = true;
-    status.textContent = "正在保存…";
+    status.textContent = t("prefs.status.saving");
     status.dataset.kind = "info";
     post("preferences.save", {
       taskpane: document.getElementById("preferenceTaskpane").checked,
@@ -776,7 +818,8 @@
       filePropertiesMenu: document.getElementById("preferenceFilePropertiesMenu").checked,
       startup: document.getElementById("preferenceStartup").checked,
       propertyDisplayOrder: document.getElementById("preferencePropertyDisplayOrder").value
-        .split(/\r?\n/).map(value => value.trim()).filter(Boolean)
+        .split(/\r?\n/).map(value => value.trim()).filter(Boolean),
+      language: document.getElementById("preferenceLanguage").value
     });
   }
 
@@ -793,6 +836,8 @@
       setChecked("preferenceFilePropertiesMenu", values.filePropertiesMenu);
       setChecked("preferenceStartup", values.startup);
       if (Array.isArray(values.propertyDisplayOrder)) document.getElementById("preferencePropertyDisplayOrder").value = values.propertyDisplayOrder.join("\n");
+      const languageSelect = document.getElementById("preferenceLanguage");
+      if (languageSelect && typeof values.language === "string" && values.language) languageSelect.value = values.language;
     }
 
     if (preferencesSaving && !busy) preferencesSaving = false;
@@ -815,18 +860,18 @@
   }
 
   function renderPropertyShell() {
-    app.innerHTML = `<section class="property-shell"><div class="file-banner"><h1 id="propertyName">SOLIDWORKS 属性</h1><div id="propertyPath" class="file-path"></div></div>
-      <div class="property-toolbar"><label>显示：<select id="propertyMode"><option value="custom">自定义属性</option><option value="configuration">配置属性</option></select></label><label id="configurationWrap" hidden>配置：<select id="configuration"></select></label></div><div id="propertyContent" class="property-content"><section class="property-group"><h2>文件信息</h2></section></div>
-      <div class="statusbar"><span id="propertyStatus">文件信息已显示</span><span id="propertyKind"></span></div></section>`;
+    app.innerHTML = `<section class="property-shell"><div class="file-banner"><h1 id="propertyName">${escapeText(t("property.title"))}</h1><div id="propertyPath" class="file-path"></div></div>
+      <div class="property-toolbar"><label>${escapeText(t("property.show"))}<select id="propertyMode"><option value="custom">${escapeText(t("property.mode.custom"))}</option><option value="configuration">${escapeText(t("property.mode.configuration"))}</option></select></label><label id="configurationWrap" hidden>${escapeText(t("property.configuration"))}<select id="configuration"></select></label></div><div id="propertyContent" class="property-content"><section class="property-group"><h2>${escapeText(t("property.group.fallback"))}</h2></section></div>
+      <div class="statusbar"><span id="propertyStatus">${escapeText(t("property.status.ready"))}</span><span id="propertyKind"></span></div></section>`;
     document.getElementById("configuration").addEventListener("change", event => post("property.select", { configuration: event.target.value }));
     document.getElementById("propertyMode").addEventListener("change", event => post("property.mode", { mode: event.target.value }));
   }
 
   function updatePropertyState() {
-    document.getElementById("propertyName").textContent = text(state.fileName || "SOLIDWORKS 属性");
+    document.getElementById("propertyName").textContent = text(state.fileName || t("property.title"));
     document.getElementById("propertyPath").textContent = text(state.fullPath || "");
     document.getElementById("propertyKind").textContent = text(state.documentKind || "");
-    document.getElementById("propertyStatus").textContent = text(state.status || "文件信息已显示");
+    document.getElementById("propertyStatus").textContent = text(state.status || t("property.status.ready"));
     const select = document.getElementById("configuration");
     const displayMode = ["custom", "configuration"].includes(state.displayMode) ? state.displayMode : "custom";
     document.getElementById("propertyMode").value = displayMode;
@@ -841,7 +886,7 @@
 
   function propertyGroup(name, properties) {
     const section = document.createElement("section"); section.className = "property-group";
-    const heading = document.createElement("h2"); heading.textContent = text(name || "属性"); section.append(heading);
+    const heading = document.createElement("h2"); heading.textContent = text(name || t("property.row.fallback")); section.append(heading);
     (Array.isArray(properties) ? properties : []).forEach(property => {
       const row = document.createElement("div"); row.className = "property-row";
       const key = document.createElement("div"); key.textContent = text(property.name || property.key);

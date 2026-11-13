@@ -1,13 +1,13 @@
 ﻿[CmdletBinding()]
 param(
-    [string]$Version = '1.3.16',
-    [ValidatePattern('^rc\d+$')][string]$ReleaseCandidate = 'rc91',
-    [string]$ProductCode = '6E45A916-D3A3-495B-BCE4-2B2BD000F237',
+    [string]$Version = '1.3.18',
+    [ValidatePattern('^rc\d+$')][string]$ReleaseCandidate = 'rc94',
+    [string]$ProductCode = 'DDA7EA84-BDED-4225-8480-9E2A0941D8E6',
     [switch]$UseControlledFrozenRestoreGraphReceipt
 )
 
 $ErrorActionPreference = 'Stop'
-$latestShippedProductVersion = [Version]'1.3.16'
+$latestShippedProductVersion = [Version]'1.3.17'
 $candidateProductVersion = [Version]$Version
 if ($candidateProductVersion -le $latestShippedProductVersion) {
     throw "Release ProductVersion must be greater than the latest shipped version ${latestShippedProductVersion}: $Version"

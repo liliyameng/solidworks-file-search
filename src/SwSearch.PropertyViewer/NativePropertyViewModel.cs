@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows;
 using SwSearch.Contracts;
+using SwSearch.WebUi;
 
 namespace SwSearch.PropertyViewer;
 
@@ -19,6 +20,7 @@ public sealed class NativePropertyViewModel : ObservableObject
     private readonly IViewerFileSystem _fileSystem;
     private readonly IPropertyDataClient _dataClient;
     private readonly Func<IReadOnlyList<string>> _propertyDisplayOrderLoader;
+    private readonly string _language;
     private IReadOnlyList<string> _propertyDisplayOrder = Array.Empty<string>();
     private DocumentMetadata? _metadata;
     private int _selectedModeIndex;
@@ -31,24 +33,38 @@ public sealed class NativePropertyViewModel : ObservableObject
         IViewerFileSystem fileSystem,
         IPropertyDataClient dataClient,
         string? legacyDisplayPreference = null,
-        Func<IReadOnlyList<string>>? propertyDisplayOrderLoader = null)
+        Func<IReadOnlyList<string>>? propertyDisplayOrderLoader = null,
+        string? language = null)
     {
         _validation = validation;
         _fileSystem = fileSystem;
         _dataClient = dataClient;
         _propertyDisplayOrderLoader = propertyDisplayOrderLoader ?? (() => Array.Empty<string>());
+        _language = string.IsNullOrEmpty(language)
+            ? UiLanguage.ResolveEffective(PropertyViewerText.ResolveConfiguredLanguage())
+            : language;
         _selectedModeIndex = ResolveInitialMode(legacyDisplayPreference) == NativePropertyMode.Configuration ? 1 : 0;
         FullPath = validation.FullPath ?? string.Empty;
-        FileName = validation.IsValid ? Path.GetFileName(FullPath) : "无法打开文件";
+        FileName = validation.IsValid ? Path.GetFileName(FullPath) : T("file.cannotOpen");
         _statusText = validation.IsValid
-            ? "暂无已提取属性，正在读取此文件"
-            : validation.ErrorMessage ?? "文件参数无效。";
+            ? T("status.reading")
+            : validation.ErrorMessage ?? T("file.invalidParameter");
         _isBusy = validation.IsValid;
     }
 
+    /// <summary>Effective UI language this view model renders with.</summary>
+    public string Language => _language;
+
+    public string ShowLabel => T("label.show");
+
+    public string ConfigurationLabel => T("label.configuration");
+
+    private string T(string key) => PropertyViewerText.Get(_language, key);
+
     public string FileName { get; }
     public string FullPath { get; }
-    public IReadOnlyList<string> ModeOptions { get; } = ["自定义属性", "配置属性"];
+    public IReadOnlyList<string> ModeOptions =>
+        [T("mode.custom"), T("mode.configuration")];
     public ObservableCollection<string> Configurations { get; } = [];
     public ObservableCollection<NativePropertyRow> Rows { get; } = [];
 
@@ -129,7 +145,7 @@ public sealed class NativePropertyViewModel : ObservableObject
                 {
                     displayOrder = Array.Empty<string>();
                 }
-                if (!_fileSystem.FileExists(FullPath)) throw new FileNotFoundException("文件不存在。", FullPath);
+                if (!_fileSystem.FileExists(FullPath)) throw new FileNotFoundException(T("err.fileMissing"), FullPath);
                 _ = _fileSystem.GetSnapshot(FullPath);
                 var cached = await _dataClient.TryGetCachedAsync(FullPath, cancellationToken).ConfigureAwait(false);
                 return (Cached: cached, DisplayOrder: displayOrder);
@@ -139,7 +155,7 @@ public sealed class NativePropertyViewModel : ObservableObject
             if (local.Cached is not null)
             {
                 ApplyMetadata(local.Cached);
-                StatusText = "属性已显示 · 正在鲜读";
+                StatusText = T("status.displayedFreshReading");
                 IsBusy = false;
                 PropertyViewerPerformanceDiagnostics.Record("native-cache-hit", clock.Elapsed.TotalMilliseconds);
                 _ = RefreshFromBrokerAsync(cachedWasDisplayed: true, cancellationToken);
@@ -147,7 +163,7 @@ public sealed class NativePropertyViewModel : ObservableObject
             }
 
             PropertyViewerPerformanceDiagnostics.Record("native-cache-miss", clock.Elapsed.TotalMilliseconds);
-            StatusText = "暂无已提取属性，正在读取此文件";
+            StatusText = T("status.reading");
             await RefreshFromBrokerAsync(cachedWasDisplayed: false, cancellationToken);
             PropertyViewerPerformanceDiagnostics.Record("native-broker-first-read", clock.Elapsed.TotalMilliseconds);
         }
@@ -157,12 +173,12 @@ public sealed class NativePropertyViewModel : ObservableObject
         }
         catch (FileNotFoundException)
         {
-            StatusText = "文件不存在，可能已被移动或删除。";
+            StatusText = T("status.fileMissing");
             IsBusy = false;
         }
         catch (Exception exception)
         {
-            StatusText = "暂时无法读取此文件的属性。";
+            StatusText = T("status.cannotRead");
             IsBusy = false;
             PropertyViewerPerformanceDiagnostics.Record(
                 "native-load-error", clock.Elapsed.TotalMilliseconds, exception.GetType().Name);
@@ -186,7 +202,7 @@ public sealed class NativePropertyViewModel : ObservableObject
                 if (isFresh)
                 {
                     ApplyMetadata(metadata);
-                    StatusText = cachedWasDisplayed ? "属性已更新（鲜读）" : "属性已读取（鲜读）";
+                    StatusText = cachedWasDisplayed ? T("status.updatedFresh") : T("status.readFresh");
                 }
                 else
                 {
@@ -195,14 +211,14 @@ public sealed class NativePropertyViewModel : ObservableObject
                         ApplyMetadata(metadata);
                     }
                     StatusText = (cachedWasDisplayed || result.CacheStale
-                                     ? "属性已显示 · 鲜读未完成，当前显示缓存 · "
+                                     ? T("status.displayedIncompletePrefix")
                                      : string.Empty) +
                                  RefreshFailureText(result);
                 }
             }
             else if (cachedWasDisplayed)
             {
-                StatusText = "属性已显示 · 鲜读失败，当前显示缓存 · " +
+                StatusText = T("status.displayedFailedPrefix") +
                              RefreshFailureText(result);
             }
             else
@@ -221,11 +237,11 @@ public sealed class NativePropertyViewModel : ObservableObject
         {
             if (cachedWasDisplayed)
             {
-                StatusText = "属性已显示 · 鲜读失败，当前显示缓存";
+                StatusText = T("status.displayedFailedShort");
             }
             else
             {
-                StatusText = "暂时无法鲜读此文件的属性。";
+                StatusText = T("status.cannotFreshRead");
             }
             IsBusy = false;
             PropertyViewerPerformanceDiagnostics.Record("native-broker-refresh", 0, exception.GetType().Name);
@@ -291,7 +307,7 @@ public sealed class NativePropertyViewModel : ObservableObject
             Rows.Add(new NativePropertyRow(property.Name, ActualValue(property)));
         }
 
-        if (Rows.Count == 0) Rows.Add(new NativePropertyRow("状态", "暂无已提取属性"));
+        if (Rows.Count == 0) Rows.Add(new NativePropertyRow(T("row.statusKey"), T("row.noProperties")));
     }
 
     private static string ActualValue(DocumentProperty property) =>
@@ -301,15 +317,15 @@ public sealed class NativePropertyViewModel : ObservableObject
         name.StartsWith("Config-", StringComparison.OrdinalIgnoreCase) &&
         name.EndsWith("-Properties", StringComparison.OrdinalIgnoreCase);
 
-    private static string RefreshFailureText(PropertyExtractionResult result) => result.ErrorCode switch
+    private string RefreshFailureText(PropertyExtractionResult result) => result.ErrorCode switch
     {
-        "BROKER_TIMEOUT" => "鲜读超时（6.5 秒），可稍后重试。",
-        "BROKER_UNAVAILABLE" => "属性服务未运行或暂不可用。",
-        "BROKER_PROTOCOL_MISMATCH" => "属性服务版本不匹配。",
+        "BROKER_TIMEOUT" => T("err.brokerTimeout"),
+        "BROKER_UNAVAILABLE" => T("err.brokerUnavailable"),
+        "BROKER_PROTOCOL_MISMATCH" => T("err.brokerMismatch"),
         _ when !string.IsNullOrWhiteSpace(result.ChineseErrorMessage) =>
             result.ChineseErrorMessage.Length <= 120
                 ? result.ChineseErrorMessage
-                : "暂时无法鲜读此文件的属性。",
-        _ => "暂时无法鲜读此文件的属性。",
+                : T("status.cannotFreshRead"),
+        _ => T("status.cannotFreshRead"),
     };
 }

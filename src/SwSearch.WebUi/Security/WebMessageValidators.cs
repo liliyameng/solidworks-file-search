@@ -175,7 +175,8 @@ public static class WebMessageValidators
                 "folderMenu",
                 "filePropertiesMenu",
                 "startup",
-                "propertyDisplayOrder") ||
+                "propertyDisplayOrder",
+                "language") ||
             !TryGetBoolean(payload, "taskpane", out _) ||
             !TryGetBoolean(payload, "folderMenu", out _) ||
             !TryGetBoolean(payload, "filePropertiesMenu", out _) ||
@@ -183,6 +184,15 @@ public static class WebMessageValidators
             !TryGetOptionalStringArray(payload, "propertyDisplayOrder", 256, 512))
         {
             return Invalid("Preferences payload is invalid.");
+        }
+        if (payload.TryGetProperty("language", out var languageNode))
+        {
+            if (languageNode.ValueKind != JsonValueKind.String ||
+                languageNode.GetString() is not { } language ||
+                !UiLanguage.IsValidConfiguredValue(language))
+            {
+                return Invalid("Preferences language is invalid.");
+            }
         }
         return Valid();
     }

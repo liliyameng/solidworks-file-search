@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Script.Serialization;
+using SwSearch.WebUi;
 
 namespace SwSearch.SolidWorksAddin
 {
@@ -106,11 +107,16 @@ namespace SwSearch.SolidWorksAddin
 
         internal static bool TryParse(string json, out TaskpaneWebCommand command, out string error)
         {
+            return TryParse(json, UiLanguage.Chinese, out command, out error);
+        }
+
+        internal static bool TryParse(string json, string language, out TaskpaneWebCommand command, out string error)
+        {
             command = null;
             error = null;
             if (String.IsNullOrWhiteSpace(json) || json.Length > 65536)
             {
-                error = "消息为空或过大。";
+                error = TaskpaneUserText.T(language, "msg.emptyOrLarge");
                 return false;
             }
 
@@ -121,20 +127,20 @@ namespace SwSearch.SolidWorksAddin
             }
             catch (Exception)
             {
-                error = "消息不是有效 JSON。";
+                error = TaskpaneUserText.T(language, "msg.invalidJson");
                 return false;
             }
 
             if (envelope == null || HasUnexpectedKeys(envelope, EnvelopeAllowedKeys))
             {
-                error = "消息信封字段不受支持。";
+                error = TaskpaneUserText.T(language, "msg.envelopeUnsupported");
                 return false;
             }
 
             string type = ReadString(envelope, "type", 32);
             if (type == null || !AllowedTypes.Contains(type))
             {
-                error = "消息类型不受支持。";
+                error = TaskpaneUserText.T(language, "msg.typeUnsupported");
                 return false;
             }
 
@@ -144,7 +150,7 @@ namespace SwSearch.SolidWorksAddin
                 requestId = ReadString(envelope, "requestId", 80);
                 if (requestId == null || !requestId.All(IsRequestIdCharacter))
                 {
-                    error = "requestId 无效。";
+                    error = TaskpaneUserText.T(language, "msg.requestIdInvalid");
                     return false;
                 }
             }
@@ -152,7 +158,7 @@ namespace SwSearch.SolidWorksAddin
             IDictionary<string, object> payload = EmptyPayload(envelope);
             if (payload == null)
             {
-                error = "payload 必须是对象。";
+                error = TaskpaneUserText.T(language, "msg.payloadObject");
                 return false;
             }
 
@@ -160,29 +166,30 @@ namespace SwSearch.SolidWorksAddin
             {
                 if (HasUnexpectedKeys(payload, ReadyPayloadAllowedKeys))
                 {
-                    error = "该消息不接受 payload 字段。";
+                    error = TaskpaneUserText.T(language, "msg.payloadNotAllowed");
                     return false;
                 }
                 if (payload.ContainsKey("view") &&
                     !String.Equals(ReadString(payload, "view", 16), "taskpane", StringComparison.Ordinal))
                 {
-                    error = "ready 视图无效。";
+                    error = TaskpaneUserText.T(language, "msg.readyViewInvalid");
                     return false;
                 }
                 command = New(type, requestId);
                 return true;
             }
 
-            if (type == "search") return TryParseSearch(payload, requestId, out command, out error);
+            if (type == "search") return TryParseSearch(payload, requestId, language, out command, out error);
             if (type == "retry")
-                return TryParseSimpleAction(type, payload, requestId, out command, out error);
-            error = "消息类型未授权。";
+                return TryParseSimpleAction(type, payload, requestId, language, out command, out error);
+            error = TaskpaneUserText.T(language, "msg.typeUnauthorized");
             return false;
         }
 
         private static bool TryParseSearch(
             IDictionary<string, object> payload,
             string requestId,
+            string language,
             out TaskpaneWebCommand command,
             out string error)
         {
@@ -192,7 +199,7 @@ namespace SwSearch.SolidWorksAddin
             // they are validated below and intentionally never reach a query.
             if (HasUnexpectedKeys(payload, SearchPayloadAllowedKeys))
             {
-                error = "搜索参数包含未授权字段。";
+                error = TaskpaneUserText.T(language, "msg.searchFields");
                 return false;
             }
 
@@ -205,7 +212,7 @@ namespace SwSearch.SolidWorksAddin
                 !TryReadOptionalInt(payload, "clientSequence", 0, Int32.MaxValue) ||
                 !TryReadOptionalInt(payload, "inputDelayMs", 0, 5000))
             {
-                error = "搜索参数无效。";
+                error = TaskpaneUserText.T(language, "msg.searchInvalid");
                 return false;
             }
 
@@ -219,6 +226,7 @@ namespace SwSearch.SolidWorksAddin
             string type,
             IDictionary<string, object> payload,
             string requestId,
+            string language,
             out TaskpaneWebCommand command,
             out string error)
         {
@@ -226,9 +234,17 @@ namespace SwSearch.SolidWorksAddin
             error = null;
             if (type == "retry")
             {
-                if (HasUnexpectedKeys(payload, RetryPayloadAllowedKeys)) { error = "重试参数无效。"; return false; }
+                if (HasUnexpectedKeys(payload, RetryPayloadAllowedKeys))
+                {
+                    error = TaskpaneUserText.T(language, "msg.retryInvalid");
+                    return false;
+                }
             }
-            else if (payload.Count != 0) { error = "操作参数无效。"; return false; }
+            else if (payload.Count != 0)
+            {
+                error = TaskpaneUserText.T(language, "msg.actionInvalid");
+                return false;
+            }
             string action = type == "browseScope" ? "browseScope" : (type == "retry" ? "retry" : "restoreScope");
             command = new TaskpaneWebCommand(
                 type, requestId, null, -1, null, -1, null, true, action, -1, null, 0, null);

@@ -24,3 +24,4 @@ installer/offline-feed/
 tests/installer/sandbox/
 installer/restore-assets.lock.json.backup-*
 installer/wix/obj/
+.zcode/

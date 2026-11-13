@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
+using SwSearch.WebUi;
 using System.Windows.Forms;
 using Microsoft.Web.WebView2.Core;
 
@@ -63,6 +64,8 @@ namespace SwSearch.SolidWorksAddin
         internal static Func<IntPtr, string, Task<TaskpaneWebViewInitializationLease>>
             InitializationFactoryForTesting;
 
+        private string _uiLanguage;
+
         internal TaskpaneCompositionWebViewHost()
         {
             SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint, true);
@@ -78,6 +81,25 @@ namespace SwSearch.SolidWorksAddin
                 Text = "正在加载搜索界面…"
             };
             Controls.Add(_nativeStatus);
+        }
+
+        /// <summary>
+        /// Effective UI language for the first page paint. Set before the host
+        /// initializes; the setter also re-localizes the native loading label.
+        /// Named distinctly from the SwSearch.WebUi.UiLanguage type so both can
+        /// be referenced in the same file without qualification.
+        /// </summary>
+        internal string EffectiveUiLanguage
+        {
+            get { return _uiLanguage; }
+            set
+            {
+                _uiLanguage = value;
+                if (!string.IsNullOrEmpty(value))
+                {
+                    _nativeStatus.Text = TaskpaneUserText.T(value, "status.loadingUi");
+                }
+            }
         }
 
         internal event EventHandler WebReady;
@@ -209,7 +231,10 @@ namespace SwSearch.SolidWorksAddin
                     if (testInitialization != null)
                         testInitialization.NavigateForTesting(ownerHandle);
                     else if (core != null)
-                        core.Navigate(WebViewRuntimeConfiguration.TaskpaneUri);
+                        core.Navigate(string.IsNullOrEmpty(_uiLanguage)
+                            ? WebViewRuntimeConfiguration.TaskpaneUri
+                            : WebViewRuntimeConfiguration.TaskpaneUri + "?lang=" +
+                              Uri.EscapeDataString(_uiLanguage));
                 }
             }
             catch (Exception exception)
@@ -438,7 +463,11 @@ namespace SwSearch.SolidWorksAddin
             if (!IsAllowedLocalOrigin(args.Source)) return;
             TaskpaneWebCommand command;
             string error;
-            if (!TaskpaneWebBridgePolicy.TryParse(args.WebMessageAsJson, out command, out error))
+            if (!TaskpaneWebBridgePolicy.TryParse(
+                    args.WebMessageAsJson,
+                    String.IsNullOrEmpty(_uiLanguage) ? UiLanguage.Chinese : _uiLanguage,
+                    out command,
+                    out error))
             {
                 PostError(null, error);
                 return;
