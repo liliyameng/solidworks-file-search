@@ -34,6 +34,10 @@
 
 **zh-CN 值与历史字面量逐字节一致**（中文系统默认观感与旧版完全相同）。
 
+## 原生结果列表列头（RC95 补充）
+
+桌面主窗口的结果列表不是 WebView：搜索框是 WebView 工具栏，结果区是原生 ExplorerBrowser + **WinForms 自绘列头**（`NativeShellResultsColumnHeader`）。列头绘制时按 `"nativeColumn." + column.Id` 查 `AppUiText`（键：`fileName`/`kind`（文件类型）`/directory`），契约 `ShellResultColumnContract` 的 zh-CN Label 仅作数据标识与回退。语言运行时切换经 `MainViewModel.UiLanguageChanged` 事件驱动列头与命中信息条（`native.matchPropertyPrefix` 等）重绘。注意 `nativeColumn.kind`（文件类型）与 HTML 网格的 `column.kind`（类型）是两个不同口径的键，勿混用。
+
 ## 不翻译的范围（刻意）
 
 - 控制台输出、日志、诊断（`app-startup.log`、`app-webui.log` 等）保持中文（开发/排障层）。

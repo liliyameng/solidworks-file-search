@@ -11,14 +11,14 @@
 
 | 项目 | 当前值 |
 |---|---|
-| 当前候选版本 | **v1.3.18 / RC94（门禁通过，未双审、未实机）** |
-| 当前安装包 | [SwSearch-x64-v1.3.18-rc94.msi](C:/Users/liliy/Documents/solidworks插件/artifacts/SwSearch-x64-v1.3.18-rc94.msi) |
-| 文件大小 | 4,638,607 bytes |
-| MSI SHA-256 | `A98C9ECBAF1C1D7EDD1C2406E28CFE32FB7F686304450F72899F112184CBA22B` |
-| 验证报告 | [SwSearch-x64-v1.3.18-rc94.verification.txt](C:/Users/liliy/Documents/solidworks插件/artifacts/SwSearch-x64-v1.3.18-rc94.verification.txt) |
-| 静态验证 | `SwSearch 1.3.18 RC94 static MSI verification: PASS` |
-| 签名/实机状态 | **MSI 未签名；未执行用户侧实机升级；未做独立双审**；静态 PASS 不等于已签名或实机通过 |
-| ProductCode | `{DDA7EA84-BDED-4225-8480-9E2A0941D8E6}` |
+| 当前候选版本 | **v1.3.18 / RC95（门禁通过，已实机安装）** |
+| 当前安装包 | [SwSearch-x64-v1.3.18-rc95.msi](C:/Users/liliy/Documents/solidworks插件/artifacts/SwSearch-x64-v1.3.18-rc95.msi) |
+| 文件大小 | 4,642,703 bytes |
+| MSI SHA-256 | `4EA52D4712B32AD0E065F487788161AE649F438B25930926ADCD7E8CAC90D7F9` |
+| 验证报告 | [SwSearch-x64-v1.3.18-rc95.verification.txt](C:/Users/liliy/Documents/solidworks插件/artifacts/SwSearch-x64-v1.3.18-rc95.verification.txt) |
+| 静态验证 | `SwSearch 1.3.18 RC95 static MSI verification: PASS` |
+| 签名/实机状态 | **MSI 未签名；RC95 已在用户实机升级安装（rc94 中间轮旧条目已干净移除）；未做独立双审**；静态 PASS 不等于已签名 |
+| ProductCode | `{B4EFF1DC-82A4-4302-B335-DBD08617D963}` |
 | UpgradeCode（稳定） | `{D9158356-29B3-44D6-A15A-ACDCE8328703}` |
 | 运行时 | .NET 8 **framework-dependent**；安装包不内置 .NET runtime |
 | 归档格式 | 不使用 7z |
@@ -31,6 +31,8 @@ RC88 候选在 RC87 基础上收口三项生产变更：运行时锁路径、Dis
 
 RC89（v1.3.14）在 RC88 载荷之上合并两类源码变更：①性能与资源专项（原生 Shell 快照 200ms 防抖、AddIDList 快路径填充、真异步填充等待、选中轮询索引探测、Broker 监控隐藏暂停+空闲退避、偏好窗口轻量 state、只读连接 Cache=Private、合并事务分相计时埋点、原生填充性能埋点、任务窗格拒绝计数免分配、删除死代码与空项目）；②资源专项（托盘隐藏时 WebView2 TrySuspend 挂起+恢复、隐藏后本进程工作集修剪）。构建 0 警告；App 聚焦回归 40/43（3 个既有失败：UNC 陈旧断言、断线清结果旧规格、NativeStatusPanel DPI）；Indexer 控制组 22/22；任务窗格行为门禁 40/40；正式 MSI 已通过静态发布门禁。**未做 MiMo/Terra 双审，未实机安装**。
 RC91（v1.3.16）在 RC90 之上补齐第二轮资源深挖（见 `docs/resource-optimization-extreme-2026-10-16.md` 第四节d）：①发现扫描**批内**自适应 IO 限速（`DiscoveryIoPacing`——MFT 与目录枚举的 1024 条检查点接入负载采样：空闲 0ms 全速；≥50%/≥75%/≥85% 或内存紧 时约 60/20/5MB/s），彻底闭合实测 241.7MB/s 扫描风暴的批内路径；②只读查询连接 mmap（core 回退 + 侧车租约，私有工作集下降）；③Broker 进程 BelowNormal 调度优先级（忙时让位前台，尽力而为）；④MetadataWorker 有意不降级（交互式属性鲜读 5s 预算）。验证：构建 0w0e；DiscoveryIoPacingTests 4/4、SystemLoadMonitorTests 7/7、Indexer 控制组+MFT 36/38（2 工程图陈旧）、PropertyViewer 13/13、App 聚焦 29/31（2 陈旧）；正式 MSI 通过静态门禁（689 受控文件）。**未双审、未实机**。
+
+RC95（v1.3.18 列头修复轮）：用户实机反馈"列的表头不跟随语言切换"。根因：桌面主窗口结果列表列头是原生 WinForms 自绘控件 `NativeShellResultsColumnHeader`，直接画共享契约 `ShellResultColumnContract` 的硬编码中文 Label，不走 WebView 语言机制（WebView 网格列与 `CreateFixedColumns` 那条路径是对的）。修复：契约 Label 保持 zh-CN 作为数据标识与回退，绘制时按 `"nativeColumn."+Id` 查 `AppUiText`（六语言新增 fileName/kind=文件类型/directory 三键；注意与 HTML 网格的 `column.kind`="类型" 是两个不同口径键）；`MainViewModel` 新增 `UiLanguageChanged` 事件（UpdateLanguageInMemory/ApplyLoadedSettings 值变化时触发），MainWindow 订阅后 `ApplyLanguage` 重绘列头并连带本地化命中信息条（"命中属性：/命中值："走 `native.match*Prefix` 键，缓存原始输入以支持重算）。测试：Rc93LanguageTests 增至 16 项全过（含六语言 nativeColumn/match 键存在性 + 列头控件源契约）；Rc71 工具栏钉旧字面量断言同步 t() 形式（22/22）；Rc68/70/73/74 原生 Shell 行为组本轮出现 testhost 空转挂起（时序型，未复现于 --no-build 快速轮），列头改动仅触及绘制文案不触及这些行为路径。门禁：`SwSearch-x64-v1.3.18-rc95.msi` 静态验证 PASS（701 受控文件，msiSha256=4EA52D47…，ProductCode `{B4EFF1DC-…}`；rc94 的 `DDA7EA84` 已入退役清单）。实机：用户授权升级成功（SW 关闭后 ExitCode 0），同版本换码导致 rc94 旧产品条目残留，已 `msiexec /x {DDA7EA84}` 干净移除（组件引用计数保护共享文件，EXE 完好 1.3.18.0），现注册表仅 `{B4EFF1DC}`，App/Broker/Workers 重启正常。
 
 RC94（v1.3.18，多语言发布轮；rc93 为同版本中间门禁轮——门禁通过后补记 RC92 实际 ProductCode `C628FD2E` 入退役清单并更新交接头表等受控文件，为使 MSI 与受控清单一致按不可覆盖规则改 rc94 重出，rc93 工件保留为未安装中间产物）按用户需求新增**多语言支持**：设置窗口新增「语言」下拉选项（跟随系统默认 + 简体中文/English/日本語/Deutsch/Français/Español），保存后立即生效、无需重启；系统语言不在列表内回退 English。实现：共享解析器 `src/Shared/UiLanguage.cs`（C#5 兼容，桌面/查看器链接编译、加载项 csc 编译，与 `WindowsScopePath.cs` 同模式——曾放 `SwSearch.WebUi` 下触发查看器"不引用 WebUi"钉死规则，已迁移）；`settings.json` 新键 `language`；安全契约链三处（`WebMessageValidators.PreferencesSave` 白名单 + `DesktopWebBridge.TryCreatePreferencesSaveRequest` + 快照回传）；WebView 层新增 `lang.js` 六语言 65 键表 + `app.js` `t()`/`applyDocumentLanguage()` 即时重渲染 + 六个 html 首帧 `?lang=`；宿主字符串表三张（`AppUiText`/`TaskpaneUserText`/`PropertyViewerText`，zh-CN 与历史字面量逐字节一致）；修复 `JsonAppSettingsStore.PrepareSaveAsync` 重序列化会清掉未知字段的陷阱（列宽防抖保存现保留 language 键，有回归测试）。生效边界：任务窗格语言在下次打开/SW 重启后生效；控制台/日志/注册表 MUIVerb/MSIX 清单保持中文（见 `docs/LOCALIZATION.md`）。测试：新增 `Rc93LanguageTests` 14 项全过；同步更新 5 个钉旧字面量的契约测试（含 Rc53 进度标签）；修复 2 个预存失败（`PreferencesProtocol` 遗留 propertyCard 字段载荷、`DesktopEntry` 单宿主计数——经 git 还原对照证明在 HEAD 已红，与本改动无关）；App 聚焦组 89/91（余 2 失败为 RC89 已记录的 UNC 陈旧断言与断线清结果旧规格）、AppSettings/Coordinator 27/33（6 个失败经还原对照证明在 HEAD 相同，环境/时序性预存）、PropertyViewer 13/13；全解 Release `--no-restore` 0w0e；加载项 csc `/warnaserror+` 通过。附带两处门禁机械化修复：①`Verify-Taskpane.ps1` 的 `GetMethod('TryParse')` 因新增语言重载抛 AmbiguousMatchException，已改为按 3 参数签名显式取原契约重载；②Mimosa PreToolUse 钩子会在 webui 资产目录下落 `.mimosa/hook-state` 污染文件（被 .gitignore 忽略但会被 Publish 打进载荷触发"Unexpected payload extensions"），发布前需清理 src 下所有 `.mimosa`。正式 MSI 通过静态发布门禁（700 受控文件，`SwSearch 1.3.18 RC94 static MSI verification: PASS`，msiSha256=A98C9ECB…）。**未双审**。实机升级：2026-11-13 用户授权后在用户机从 1.3.17 升级到 1.3.18——MSI `FailIfSolidWorksRunning` 设计按预期拦截（首次尝试 1603，SLDWORKS 占用加载项 DLL），用户保存关闭 SOLIDWORKS 后二次安装 ExitCode 0；注册表确认 1.3.18 / ProductCode `{DDA7EA84-…}`，全部 EXE 1.3.18.0，`webui\lang.js` 已随载荷部署，App/Broker 启动正常。运维备注：MSI 路径含中文（`…\solidworks插件\…`）经 PowerShell 传参给 msiexec 会编码损坏报 1619，复制到 ASCII 临时路径安装即可。
 

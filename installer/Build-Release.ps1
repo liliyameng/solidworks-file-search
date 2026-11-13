@@ -1,8 +1,8 @@
 ﻿[CmdletBinding()]
 param(
     [string]$Version = '1.3.18',
-    [ValidatePattern('^rc\d+$')][string]$ReleaseCandidate = 'rc94',
-    [string]$ProductCode = 'DDA7EA84-BDED-4225-8480-9E2A0941D8E6',
+    [ValidatePattern('^rc\d+$')][string]$ReleaseCandidate = 'rc95',
+    [string]$ProductCode = 'B4EFF1DC-82A4-4302-B335-DBD08617D963',
     [switch]$UseControlledFrozenRestoreGraphReceipt
 )
 

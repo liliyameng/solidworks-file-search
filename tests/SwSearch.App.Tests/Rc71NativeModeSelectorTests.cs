@@ -71,9 +71,10 @@ public sealed class Rc71NativeModeSelectorTests
         StringAssert.Contains(js, "id=\"modeGroup\" class=\"mode-group\" role=\"group\"");
         Assert.AreEqual(1, js.Split("id=\"modeGroup\"", StringSplitOptions.None).Length - 1,
             "The shared desktop template must render one mode group per active view.");
-        StringAssert.Contains(js, "data-mode=\"all\" aria-pressed=\"true\">全部</button>");
-        StringAssert.Contains(js, "data-mode=\"name\" aria-pressed=\"false\">文件名</button>");
-        StringAssert.Contains(js, "data-mode=\"property\" aria-pressed=\"false\">属性</button>");
+        // RC93 i18n: labels resolve through the shared lang tables.
+        StringAssert.Contains(js, "data-mode=\"all\" aria-pressed=\"true\">${escapeText(t(\"mode.all\"))}</button>");
+        StringAssert.Contains(js, "data-mode=\"name\" aria-pressed=\"false\">${escapeText(t(\"mode.name\"))}</button>");
+        StringAssert.Contains(js, "data-mode=\"property\" aria-pressed=\"false\">${escapeText(t(\"mode.property\"))}</button>");
         StringAssert.Contains(js, "option.getAttribute(\"aria-pressed\") === \"true\"");
         StringAssert.Contains(js, "post(\"mode\", { mode: option.dataset.mode });");
         StringAssert.Contains(js, "else updateDesktopModeButtons(mode);");

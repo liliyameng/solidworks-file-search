@@ -1,8 +1,8 @@
 ﻿[CmdletBinding()]
 param(
     [string]$Version = '1.3.18',
-    [ValidatePattern('^rc\d+$')][string]$ReleaseCandidate = 'rc94',
-    [string]$ProductCode = 'DDA7EA84-BDED-4225-8480-9E2A0941D8E6',
+    [ValidatePattern('^rc\d+$')][string]$ReleaseCandidate = 'rc95',
+    [string]$ProductCode = 'B4EFF1DC-82A4-4302-B335-DBD08617D963',
     [Parameter(Mandatory = $true)][ValidatePattern('^[0-9a-f]{32}$')][string]$TransactionNonce,
     [Parameter(Mandatory = $true)][string]$PreviousMsi,
     [Parameter(Mandatory = $true)][string]$ControlledManifest,
@@ -83,6 +83,7 @@ $retiredProductCodes=@(
     'A55D5C1E-1D56-4F7F-9E5A-4F2802DD7B44','7328AB61-578D-47EC-83AE-01A35882D33E',
     '3B6A5C7D-4E92-4B01-A7F6-9D2C815E46A0','6F2D9A8C-31B7-4E65-92C4-5A780D1F47B3',
     '6E45A916-D3A3-495B-BCE4-2B2BD000F237','C628FD2E-2F28-4F6A-83C9-798186AEAEC5',
+    'DDA7EA84-BDED-4225-8480-9E2A0941D8E6',
     '3C785AD1-D656-4CB7-838E-7910549BD360',
     'A9A0861A-E300-4DFA-ACBF-0EC3E45ACBE6',
     '0EA6EB28-90CC-4C74-A870-6A885DE49BF7',

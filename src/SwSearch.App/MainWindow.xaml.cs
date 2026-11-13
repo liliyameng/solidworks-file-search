@@ -46,6 +46,8 @@ public partial class MainWindow : Window
     private string? _lastFocusedPath;
     private string? _lastMatchPropertyText;
     private string? _lastMatchValueText;
+    private string? _lastMatchProperty;
+    private string? _lastMatchValue;
     private CancellationTokenSource? _nativeShellPagingCancellation;
     private readonly CancellationTokenSource _nativeShellLifetime = new();
     private long _nativeShellGeneration;
@@ -103,6 +105,8 @@ public partial class MainWindow : Window
             out _matchInfoPanel,
             out _matchPropertyLabel,
             out _matchValueLabel);
+        ViewModel.UiLanguageChanged += ViewModelOnUiLanguageChanged;
+        ApplyUiLanguage();
         _nativeColumnApplyTimer = new DispatcherTimer(DispatcherPriority.Background)
         {
             Interval = TimeSpan.FromMilliseconds(40),
@@ -899,8 +903,17 @@ public partial class MainWindow : Window
 
     private void SetMatchInfoText(string? matchedProperty, string? matchedValue)
     {
-        var propertyText = $"命中属性：{(string.IsNullOrEmpty(matchedProperty) ? "文件名" : matchedProperty)}";
-        var valueText = $"命中值：{(string.IsNullOrEmpty(matchedValue) ? "—" : matchedValue)}";
+        _lastMatchProperty = matchedProperty;
+        _lastMatchValue = matchedValue;
+        var language = ViewModel.UiLanguageEffective;
+        var propertyText = AppUiText.F(
+            language,
+            "native.matchPropertyPrefix",
+            string.IsNullOrEmpty(matchedProperty) ? AppUiText.Get(language, "native.matchFallback") : matchedProperty);
+        var valueText = AppUiText.F(
+            language,
+            "native.matchValuePrefix",
+            string.IsNullOrEmpty(matchedValue) ? AppUiText.Get(language, "native.matchDash") : matchedValue);
         if (!string.Equals(propertyText, _lastMatchPropertyText, StringComparison.Ordinal))
         {
             _matchPropertyLabel.Text = propertyText;
@@ -916,6 +929,26 @@ public partial class MainWindow : Window
             _matchValueLabel.Text = valueText;
             _lastMatchValueText = valueText;
         }
+    }
+
+    /// <summary>Re-localizes native surfaces (Shell column header, match strip) for the current language.</summary>
+    private void ApplyUiLanguage()
+    {
+        _nativeColumnHeader.ApplyLanguage(ViewModel.UiLanguageEffective);
+        // Drop the deduplicated texts so the strip re-renders in the new
+        // language with whatever match is currently selected.
+        _lastMatchPropertyText = null;
+        _lastMatchValueText = null;
+        SetMatchInfoText(_lastMatchProperty, _lastMatchValue);
+    }
+
+    private void ViewModelOnUiLanguageChanged()
+    {
+        if (_closed)
+        {
+            return;
+        }
+        _ = Dispatcher.BeginInvoke(DispatcherPriority.Normal, (Action)ApplyUiLanguage);
     }
 
     internal static (string? MatchedProperty, string? MatchedValue)? GetDefaultMatchFromMap(

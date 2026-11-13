@@ -457,8 +457,13 @@ public sealed class MainViewModel : ObservableObject, IDisposable
                 DiscoveryPreference = DiscoveryPreference.Automatic,
                 BackgroundPaused = false,
             };
+            var languageBeforeApply = _uiLanguageEffective;
             _uiLanguageEffective = UiLanguage.ResolveEffective(UiLanguage.SanitizeConfigured(settings.Language ?? string.Empty));
             _metadataProgressEpochTracker.Language = _uiLanguageEffective;
+            var languageChanged = !string.Equals(
+                _uiLanguageEffective,
+                languageBeforeApply,
+                StringComparison.Ordinal);
             SelectedDiscoveryOption = DiscoveryOptions.First(option => option.Value == DiscoveryPreference.Automatic);
             NetworkRootsText = string.Join(Environment.NewLine, settings.NetworkRoots);
             IsBackgroundPaused = false;
@@ -466,6 +471,10 @@ public sealed class MainViewModel : ObservableObject, IDisposable
             if (_searchClient is IRuntimeControlClient runtime)
             {
                 runtime.SetBackgroundPaused(false);
+            }
+            if (languageChanged)
+            {
+                UiLanguageChanged?.Invoke();
             }
         }
         finally
@@ -596,16 +605,33 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     /// <summary>Effective UI language used for every user-facing string this model produces.</summary>
     public string UiLanguageEffective => _uiLanguageEffective;
 
+    /// <summary>
+    /// Raised on the UI thread whenever the effective UI language changes
+    /// (loaded settings or an in-session preferences save), so native
+    /// surfaces (Shell column header, match-info strip) can re-localize.
+    /// </summary>
+    public event Action? UiLanguageChanged;
+
     private string T(string key) => AppUiText.Get(_uiLanguageEffective, key);
 
     private string TF(string key, params object?[] args) => AppUiText.F(_uiLanguageEffective, key, args);
+
+    private void SetUiLanguageEffective(string effective)
+    {
+        if (string.Equals(_uiLanguageEffective, effective, StringComparison.Ordinal))
+        {
+            return;
+        }
+        _uiLanguageEffective = effective;
+        _metadataProgressEpochTracker.Language = effective;
+        UiLanguageChanged?.Invoke();
+    }
 
     internal void UpdateLanguageInMemory(string? configured)
     {
         var sanitized = UiLanguage.SanitizeConfigured(configured ?? string.Empty);
         _settings = _settings with { Language = sanitized };
-        _uiLanguageEffective = UiLanguage.ResolveEffective(sanitized);
-        _metadataProgressEpochTracker.Language = _uiLanguageEffective;
+        SetUiLanguageEffective(UiLanguage.ResolveEffective(sanitized));
     }
 
     internal void ApplyPersistedSettings(AppSettings settings)

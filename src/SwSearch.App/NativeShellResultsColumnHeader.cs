@@ -1,3 +1,5 @@
+using SwSearch.WebUi;
+
 using Forms = System.Windows.Forms;
 
 namespace SwSearch.App;
@@ -5,7 +7,9 @@ namespace SwSearch.App;
 /// <summary>
 /// A WinForms-native header for the hidden-header ExplorerBrowser below it.
 /// Its order and widths come from the exact same standard Shell property
-/// contract as the real DetailsView rows.
+/// contract as the real DetailsView rows. Column labels localize at paint
+/// time through <see cref="AppUiText"/> ("nativeColumn." + id); the contract
+/// Label stays the zh-CN fallback.
 /// </summary>
 internal sealed class NativeShellResultsColumnHeader : Forms.Control
 {
@@ -21,6 +25,7 @@ internal sealed class NativeShellResultsColumnHeader : Forms.Control
     private int _pressedColumn = -1;
     private string? _sortColumn;
     private string? _sortDirection;
+    private string? _language;
 
     internal NativeShellResultsColumnHeader()
     {
@@ -69,6 +74,20 @@ internal sealed class NativeShellResultsColumnHeader : Forms.Control
         Invalidate();
     }
 
+    /// <summary>Repaints with column labels resolved for a new UI language.</summary>
+    internal void ApplyLanguage(string language)
+    {
+        _language = language;
+        Invalidate();
+    }
+
+    private string ColumnLabel(SwSearch.WebUi.Native.NativeShellColumnDefinition column)
+    {
+        var key = "nativeColumn." + column.Id;
+        var localized = AppUiText.Get(_language ?? UiLanguage.Chinese, key);
+        return string.Equals(localized, key, StringComparison.Ordinal) ? column.Label : localized;
+    }
+
     protected override void OnResize(EventArgs eventArgs)
     {
         base.OnResize(eventArgs);
@@ -91,7 +110,7 @@ internal sealed class NativeShellResultsColumnHeader : Forms.Control
                     : System.Drawing.SystemColors.Control);
             eventArgs.Graphics.FillRectangle(background, cell);
 
-            var label = _columns[index].Label;
+            var label = ColumnLabel(_columns[index]);
             if (string.Equals(_sortColumn, _columns[index].Id, StringComparison.Ordinal))
             {
                 label += string.Equals(_sortDirection, "desc", StringComparison.Ordinal) ? "  ↓" : "  ↑";

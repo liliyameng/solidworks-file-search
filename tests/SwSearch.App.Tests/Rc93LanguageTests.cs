@@ -315,6 +315,51 @@ public sealed class Rc93LanguageTests
         Assert.IsTrue(appJs.Contains("applyDocumentLanguage", StringComparison.Ordinal));
     }
 
+    [TestMethod]
+    public void AppUiText_NativeColumnAndMatchKeys_ExistInEveryLanguage()
+    {
+        string[] keys =
+        [
+            "nativeColumn.fileName",
+            "nativeColumn.kind",
+            "nativeColumn.directory",
+            "native.matchPropertyPrefix",
+            "native.matchFallback",
+            "native.matchValuePrefix",
+            "native.matchDash",
+        ];
+        foreach (var language in new[] { UiLanguage.Chinese, "en", "ja", "de", "fr", "es" })
+        {
+            foreach (var key in keys)
+            {
+                Assert.AreNotEqual(
+                    key,
+                    AppUiText.Get(language, key),
+                    $"{key} must be defined for {language}");
+            }
+        }
+        // The painted header keeps the exact historical zh-CN contract labels.
+        Assert.AreEqual("文件类型", AppUiText.Get(UiLanguage.Chinese, "nativeColumn.kind"));
+        Assert.AreEqual("所在文件夹", AppUiText.Get(UiLanguage.Chinese, "nativeColumn.directory"));
+    }
+
+    [TestMethod]
+    public void NativeShellResultsColumnHeader_ResolvesPaintedLabelsThroughLanguageTable()
+    {
+        var root = Path.GetFullPath(Path.Combine(
+            AppContext.BaseDirectory, "..", "..", "..", "..", "..",
+            "src", "SwSearch.App", "NativeShellResultsColumnHeader.cs"));
+        var source = File.ReadAllText(root);
+        Assert.IsTrue(source.Contains("internal void ApplyLanguage", StringComparison.Ordinal));
+        Assert.IsTrue(source.Contains("\"nativeColumn.\" +", StringComparison.Ordinal));
+        Assert.IsTrue(source.Contains("AppUiText.Get", StringComparison.Ordinal));
+        // The MainWindow host must re-localize on an in-session change.
+        var window = File.ReadAllText(Path.Combine(
+            Path.GetDirectoryName(root)!, "MainWindow.xaml.cs"));
+        Assert.IsTrue(window.Contains("UiLanguageChanged += ViewModelOnUiLanguageChanged", StringComparison.Ordinal));
+        Assert.IsTrue(window.Contains("ApplyLanguage(ViewModel.UiLanguageEffective)", StringComparison.Ordinal));
+    }
+
     private static void AssertAccepted(WebMessageRouter router, object payload, string language)
     {
         var json = JsonSerializer.Serialize(new { type = "preferences.save", payload });
